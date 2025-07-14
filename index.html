@@ -1580,7 +1580,7 @@
             document.getElementById(tabName + '-view').classList.remove('hidden');
             switch(tabName) {
                 case 'daily':
-                    currentDate = new Date(); // 무조건 오늘 날짜로 세팅
+                    // currentDate를 건드리지 않음!
                     updateCurrentDate();
                     renderSchedule();
                     renderTaskList();
