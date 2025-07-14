@@ -1643,13 +1643,16 @@
             }
         }
         window.addEventListener('DOMContentLoaded', () => {
+            // 테마 복원
             const saved = localStorage.getItem('timeTracker_themeMode');
             if (saved === 'dark') {
                 document.documentElement.setAttribute('data-theme', 'dark');
                 const btn = document.getElementById('theme-toggle-btn');
                 if (btn) btn.textContent = '☀️ 라이트모드';
             }
-            // 항상 일간 뷰가 기본으로 보이게
+            // 설정값 복원 및 적용
+            loadSettings();
+            applySettings();
             showTab('daily');
         });
     </script>
