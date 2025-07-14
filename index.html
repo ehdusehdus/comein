@@ -516,27 +516,6 @@
                 gap: 8px;
             }
         }
-        .settings-section h3 {
-            margin-bottom: 18px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .settings-section {
-            margin-bottom: 40px;
-        }
-        .setting-group {
-            margin-bottom: 22px;
-        }
-        .settings-section label {
-            margin-bottom: 7px;
-            display: inline-block;
-        }
-        .slider-group, .color-picker-group, .data-buttons, .toggle-options {
-            margin-top: 4px;
-        }
-        .settings-section, .setting-group, .slider-group, .color-picker-group, .data-buttons, .toggle-options {
-            line-height: 1.7;
-        }
     </style>
 </head>
 <body>
@@ -1664,15 +1643,14 @@
             }
         }
         window.addEventListener('DOMContentLoaded', () => {
-            // 테마 복원
             const saved = localStorage.getItem('timeTracker_themeMode');
             if (saved === 'dark') {
                 document.documentElement.setAttribute('data-theme', 'dark');
                 const btn = document.getElementById('theme-toggle-btn');
                 if (btn) btn.textContent = '☀️ 라이트모드';
             }
-            // 모든 초기화(설정, 렌더링 등) 한 번에!
-            init();
+            // 항상 일간 뷰가 기본으로 보이게
+            showTab('daily');
         });
     </script>
 </body>
