@@ -542,8 +542,8 @@
                             <select id="end-minute"></select>
                         </div>
                         <div class="form-btns-right">
-                            <button class="btn btn-secondary" onclick="clearTodayTasks()" title="오늘 일정 전체 삭제">🔄</button>
                             <button class="btn btn-primary" onclick="addTask()" title="할일 추가">➕</button>
+                            <button class="btn btn-secondary" onclick="clearTodayTasks()" title="오늘 일정 전체 삭제">🔄</button>
                         </div>
                     </div>
                 </div>
@@ -1654,6 +1654,13 @@
             currentWeek.setDate(currentWeek.getDate() + weeks * 7);
             updateWeekDisplay();
             renderWeekView();
+        }
+
+        // 월간 이동 함수 추가
+        function changeMonth(months) {
+            currentMonth.setMonth(currentMonth.getMonth() + months);
+            updateMonthDisplay();
+            renderMonthView();
         }
         // 무조건 DOMContentLoaded에서만 init 실행
         document.addEventListener('DOMContentLoaded', function() {
