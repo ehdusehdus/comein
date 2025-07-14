@@ -47,8 +47,8 @@
 
         .nav-tab.active {
             background: white;
-            color: #667eea;
-            border-bottom: 3px solid #667eea;
+            color: #495057;
+            border-bottom: 3px solid #6c757d;
         }
 
         .nav-tab:hover {
@@ -96,27 +96,28 @@
 
         .form-group input:focus, .form-group select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #6c757d;
         }
 
         .btn {
-            padding: 12px 24px;
+            padding: 12px 20px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
             transition: all 0.3s ease;
             margin-right: 10px;
+            min-width: 45px;
         }
 
         .btn-primary {
-            background: #667eea;
+            background: #6c757d;
             color: white;
         }
 
         .btn-primary:hover {
-            background: #5a6fd8;
+            background: #5a6268;
             transform: translateY(-2px);
         }
 
@@ -149,7 +150,7 @@
         .date-nav-btn {
             padding: 10px 15px;
             border: none;
-            background: #667eea;
+            background: #6c757d;
             color: white;
             border-radius: 8px;
             cursor: pointer;
@@ -157,7 +158,7 @@
         }
 
         .date-nav-btn:hover {
-            background: #5a6fd8;
+            background: #5a6268;
         }
 
         .current-date {
@@ -195,6 +196,7 @@
             min-height: 40px;
             display: flex;
             align-items: center;
+            justify-content: center;
             padding: 5px;
             font-size: 12px;
             color: white;
@@ -202,6 +204,7 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
             position: relative;
             cursor: pointer;
+            text-align: center;
         }
 
         .time-slot.empty {
@@ -223,7 +226,7 @@
         }
 
         .week-header {
-            background: #667eea;
+            background: #6c757d;
             color: white;
             padding: 10px;
             text-align: center;
@@ -240,7 +243,7 @@
         }
 
         .task-item {
-            background: #667eea;
+            background: #6c757d;
             color: white;
             padding: 2px 4px;
             margin: 1px 0;
@@ -303,11 +306,12 @@
         }
 
         .btn-small {
-            padding: 5px 10px;
-            font-size: 12px;
+            padding: 6px 12px;
+            font-size: 14px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            min-width: 35px;
         }
 
         .stats-grid {
@@ -333,7 +337,7 @@
         .stats-value {
             font-size: 2em;
             font-weight: bold;
-            color: #667eea;
+            color: #495057;
         }
 
         .stats-chart {
@@ -366,7 +370,7 @@
 
         .chart-fill {
             height: 100%;
-            background: #667eea;
+            background: #6c757d;
             transition: width 0.3s ease;
         }
 
@@ -402,13 +406,13 @@
             <button class="nav-tab" onclick="showTab('weekly')">주간 뷰</button>
             <button class="nav-tab" onclick="showTab('monthly')">월간 뷰</button>
             <button class="nav-tab" onclick="showTab('stats')">통계</button>
+            <button class="nav-tab" onclick="showTab('settings')">설정</button>
         </div>
 
         <div class="content">
             <!-- 일간 뷰 -->
             <div id="daily-view" class="view-content">
                 <div class="form-section">
-                    <h3>할일 추가</h3>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="task-name">할일</label>
@@ -416,7 +420,7 @@
                         </div>
                         <div class="form-group">
                             <label for="task-color">색상</label>
-                            <input type="color" id="task-color" value="#667eea">
+                            <input type="color" id="task-color" value="#6c757d">
                         </div>
                         <div class="form-group">
                             <label for="start-hour">시작 시간</label>
@@ -435,15 +439,15 @@
                             <select id="end-minute"></select>
                         </div>
                     </div>
-                    <button class="btn btn-primary" onclick="addTask()">➕ 추가</button>
-                    <button class="btn btn-secondary" onclick="resetForm()">🔄 초기화</button>
-                    <button class="btn btn-danger" onclick="clearAllTasks()">🗑️ 전체 삭제</button>
+                    <button class="btn btn-primary" onclick="addTask()" title="할일 추가">➕</button>
+                    <button class="btn btn-secondary" onclick="resetForm()" title="폼 초기화">🔄</button>
+                    <button class="btn btn-danger" onclick="clearAllTasks()" title="전체 삭제">🗑️</button>
                 </div>
 
                 <div class="date-navigator">
-                    <button class="date-nav-btn" onclick="changeDate(-1)">◀ 이전</button>
+                    <button class="date-nav-btn" onclick="changeDate(-1)" title="이전 날">◀</button>
                     <div class="current-date" id="current-date"></div>
-                    <button class="date-nav-btn" onclick="changeDate(1)">다음 ▶</button>
+                    <button class="date-nav-btn" onclick="changeDate(1)" title="다음 날">▶</button>
                 </div>
 
                 <div class="task-list">
@@ -457,9 +461,9 @@
             <!-- 주간 뷰 -->
             <div id="weekly-view" class="view-content hidden">
                 <div class="date-navigator">
-                    <button class="date-nav-btn" onclick="changeWeek(-1)">◀ 이전 주</button>
+                    <button class="date-nav-btn" onclick="changeWeek(-1)" title="이전 주">◀</button>
                     <div class="current-date" id="current-week"></div>
-                    <button class="date-nav-btn" onclick="changeWeek(1)">다음 주 ▶</button>
+                    <button class="date-nav-btn" onclick="changeWeek(1)" title="다음 주">▶</button>
                 </div>
                 <div class="week-grid" id="week-grid"></div>
             </div>
@@ -467,9 +471,9 @@
             <!-- 월간 뷰 -->
             <div id="monthly-view" class="view-content hidden">
                 <div class="date-navigator">
-                    <button class="date-nav-btn" onclick="changeMonth(-1)">◀ 이전 달</button>
+                    <button class="date-nav-btn" onclick="changeMonth(-1)" title="이전 달">◀</button>
                     <div class="current-date" id="current-month"></div>
-                    <button class="date-nav-btn" onclick="changeMonth(1)">다음 달 ▶</button>
+                    <button class="date-nav-btn" onclick="changeMonth(1)" title="다음 달">▶</button>
                 </div>
                 <div id="month-grid"></div>
             </div>
@@ -499,6 +503,112 @@
                     <div id="category-chart"></div>
                 </div>
             </div>
+
+            <!-- 설정 뷰 -->
+            <div id="settings-view" class="view-content hidden">
+                <div class="settings-section">
+                    <h3>🎨 외관 설정</h3>
+                    <div class="setting-group">
+                        <label>인터페이스 색상</label>
+                        <div class="color-picker-group">
+                            <input type="color" id="interface-color" value="#ffffff" onchange="changeCustomTheme(this.value)">
+                            <span class="color-preview" id="color-preview"></span>
+                            <button class="reset-btn" onclick="resetToDefaultColors()">기본값으로 복구</button>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label>텍스트 그림자</label>
+                        <div class="toggle-options">
+                            <button class="toggle-btn active" data-shadow="off" onclick="toggleTextShadow(false)">끄기</button>
+                            <button class="toggle-btn" data-shadow="on" onclick="toggleTextShadow(true)">켜기</button>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label>일정 블록 투명도</label>
+                        <div class="slider-group">
+                            <input type="range" id="opacity-slider" min="0.3" max="1" step="0.1" value="1" onchange="changeOpacity(this.value)">
+                            <span class="slider-value" id="opacity-value">100%</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label>시간표 높이</label>
+                        <div class="slider-group">
+                            <input type="range" id="height-slider" min="30" max="80" step="5" value="40" onchange="changeSlotHeight(this.value)">
+                            <span class="slider-value" id="height-value">40px</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>⚙️ 기능 설정</h3>
+                    <div class="setting-group">
+                        <label>시간 표시 형식</label>
+                        <div class="toggle-options">
+                            <button class="toggle-btn active" data-format="24" onclick="changeTimeFormat('24')">24시간</button>
+                            <button class="toggle-btn" data-format="12" onclick="changeTimeFormat('12')">12시간</button>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label>주말 표시</label>
+                        <div class="toggle-options">
+                            <button class="toggle-btn active" data-weekend="show" onclick="toggleWeekend(true)">표시</button>
+                            <button class="toggle-btn" data-weekend="hide" onclick="toggleWeekend(false)">숨기기</button>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label>할일 글자 크기</label>
+                        <div class="slider-group">
+                            <input type="range" id="font-slider" min="10" max="16" step="1" value="12" onchange="changeFontSize(this.value)">
+                            <span class="slider-value" id="font-value">12px</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>📊 데이터 관리</h3>
+                    <div class="setting-group">
+                        <label>데이터 백업/복원</label>
+                        <div class="data-buttons">
+                            <button class="btn btn-secondary" onclick="exportData()">📤 내보내기</button>
+                            <input type="file" id="import-file" accept=".json" style="display: none" onchange="importData(event)">
+                            <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">📥 가져오기</button>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label>저장된 데이터 정보</label>
+                        <div class="data-info">
+                            <p>총 기록 일수: <span id="total-records">0</span>일</p>
+                            <p>총 할일 개수: <span id="total-tasks">0</span>개</p>
+                            <p>데이터 크기: <span id="data-size">0</span>KB</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>🎯 고급 설정</h3>
+                    <div class="setting-group">
+                        <label>자동 저장</label>
+                        <div class="toggle-options">
+                            <button class="toggle-btn active" data-autosave="on" onclick="toggleAutoSave(true)">켜기</button>
+                            <button class="toggle-btn" data-autosave="off" onclick="toggleAutoSave(false)">끄기</button>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label>할일 자동완성</label>
+                        <div class="toggle-options">
+                            <button class="toggle-btn active" data-autocomplete="on" onclick="toggleAutoComplete(true)">켜기</button>
+                            <button class="toggle-btn" data-autocomplete="off" onclick="toggleAutoComplete(false)">끄기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -511,12 +621,200 @@
         let taskColors = {};
         let editingTask = null;
         let colorIndex = 0;
+        let currentTheme = '#ffffff';
+        let textShadowEnabled = false;
+        let taskOpacity = 1;
+        let slotHeight = 40;
+        let timeFormat = '24';
+        let showWeekend = true;
+        let fontSize = 12;
+        let autoSave = true;
+        let autoComplete = true;
 
         const colors = [
             '#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe',
             '#43e97b', '#38f9d7', '#ffecd2', '#fcb69f', '#a8edea', '#fed6e3',
             '#ffb7b2', '#ffeaa7', '#d1f2eb', '#fad7a0', '#e8daef', '#aed6f1'
         ];
+
+        // 설정 관련 함수들
+        function changeCustomTheme(color) {
+            currentTheme = color;
+            document.documentElement.style.setProperty('--primary-color', color);
+            
+            // 색상 미리보기 업데이트
+            document.getElementById('color-preview').style.backgroundColor = color;
+            
+            saveSettings();
+        }
+
+        function resetToDefaultColors() {
+            changeCustomTheme('#ffffff');
+            document.getElementById('interface-color').value = '#ffffff';
+        }
+
+        function toggleTextShadow(enabled) {
+            textShadowEnabled = enabled;
+            const shadowValue = enabled ? '1px 1px 2px rgba(0,0,0,0.5)' : 'none';
+            document.documentElement.style.setProperty('--text-shadow', shadowValue);
+            
+            updateToggleButtons('.toggle-btn[data-shadow]', enabled ? 'on' : 'off');
+            saveSettings();
+        }
+
+        function changeOpacity(value) {
+            taskOpacity = value;
+            document.getElementById('opacity-value').textContent = Math.round(value * 100) + '%';
+            
+            // 모든 할일 블록에 투명도 적용
+            document.querySelectorAll('.time-slot:not(.empty)').forEach(slot => {
+                slot.style.opacity = value;
+            });
+            
+            saveSettings();
+        }
+
+        function changeSlotHeight(value) {
+            slotHeight = value;
+            document.getElementById('height-value').textContent = value + 'px';
+            document.documentElement.style.setProperty('--slot-height', value + 'px');
+            
+            saveSettings();
+        }
+
+        function changeTimeFormat(format) {
+            timeFormat = format;
+            updateToggleButtons('.toggle-btn[data-format]', format);
+            renderSchedule(); // 시간표 다시 렌더링
+            saveSettings();
+        }
+
+        function toggleWeekend(show) {
+            showWeekend = show;
+            updateToggleButtons('.toggle-btn[data-weekend]', show ? 'show' : 'hide');
+            saveSettings();
+        }
+
+        function changeFontSize(value) {
+            fontSize = value;
+            document.getElementById('font-value').textContent = value + 'px';
+            document.documentElement.style.setProperty('--font-size', value + 'px');
+            saveSettings();
+        }
+
+        function toggleAutoSave(enabled) {
+            autoSave = enabled;
+            updateToggleButtons('.toggle-btn[data-autosave]', enabled ? 'on' : 'off');
+            saveSettings();
+        }
+
+        function toggleAutoComplete(enabled) {
+            autoComplete = enabled;
+            updateToggleButtons('.toggle-btn[data-autocomplete]', enabled ? 'on' : 'off');
+            saveSettings();
+        }
+
+        function updateToggleButtons(selector, activeValue) {
+            document.querySelectorAll(selector).forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset[Object.keys(btn.dataset)[0]] === activeValue) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function exportData() {
+            const data = {
+                tasks: tasks,
+                taskColors: taskColors,
+                settings: {
+                    currentTheme, textShadowEnabled, taskOpacity, slotHeight,
+                    timeFormat, showWeekend, fontSize, autoSave, autoComplete
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'timetracker_backup.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.tasks) tasks = data.tasks;
+                    if (data.taskColors) taskColors = data.taskColors;
+                    if (data.settings) {
+                        Object.assign({
+                            currentTheme, textShadowEnabled, taskOpacity, slotHeight,
+                            timeFormat, showWeekend, fontSize, autoSave, autoComplete
+                        }, data.settings);
+                    }
+                    
+                    saveTasks();
+                    saveSettings();
+                    location.reload(); // 페이지 새로고침으로 모든 설정 적용
+                } catch (error) {
+                    alert('파일을 읽는 중 오류가 발생했습니다.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function updateDataInfo() {
+            const totalRecords = Object.keys(tasks).length;
+            const totalTasks = Object.values(tasks).reduce((sum, dayTasks) => sum + dayTasks.length, 0);
+            const dataSize = Math.round(JSON.stringify({tasks, taskColors}).length / 1024);
+            
+            document.getElementById('total-records').textContent = totalRecords;
+            document.getElementById('total-tasks').textContent = totalTasks;
+            document.getElementById('data-size').textContent = dataSize;
+        }
+
+        function saveSettings() {
+            const settings = {
+                currentTheme, textShadowEnabled, taskOpacity, slotHeight,
+                timeFormat, showWeekend, fontSize, autoSave, autoComplete
+            };
+            localStorage.setItem('timeTracker_settings', JSON.stringify(settings));
+        }
+
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('timeTracker_settings');
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                Object.assign({
+                    currentTheme, textShadowEnabled, taskOpacity, slotHeight,
+                    timeFormat, showWeekend, fontSize, autoSave, autoComplete
+                }, settings);
+            }
+            
+            // UI에 설정 적용
+            changeCustomTheme(currentTheme);
+            toggleTextShadow(textShadowEnabled);
+            changeOpacity(taskOpacity);
+            changeSlotHeight(slotHeight);
+            changeTimeFormat(timeFormat);
+            toggleWeekend(showWeekend);
+            changeFontSize(fontSize);
+            toggleAutoSave(autoSave);
+            toggleAutoComplete(autoComplete);
+            
+            // 입력 필드 값 설정
+            document.getElementById('interface-color').value = currentTheme;
+            document.getElementById('opacity-slider').value = taskOpacity;
+            document.getElementById('height-slider').value = slotHeight;
+            document.getElementById('font-slider').value = fontSize;
+        }
 
         // 초기화
         function init() {
@@ -565,7 +863,7 @@
                 for (let i = 0; i < 6; i++) {
                     const option = document.createElement('option');
                     option.value = i + 24;
-                    option.textContent = i.toString().padStart(2, '0') + '시 (다음날)';
+                    option.textContent = i.toString().padStart(2, '0') + '시';
                     select.appendChild(option);
                 }
             });
@@ -583,7 +881,19 @@
             });
         }
 
-        // 현재 날짜 업데이트
+        // 할일 이름 입력 필드에 이벤트 리스너 추가
+        function setupTaskNameListener() {
+            const taskNameInput = document.getElementById('task-name');
+            const colorInput = document.getElementById('task-color');
+            
+            taskNameInput.addEventListener('input', function() {
+                const taskName = this.value.trim();
+                if (taskName && taskColors[taskName]) {
+                    // 이미 사용된 할일 이름이면 기존 색상으로 설정
+                    colorInput.value = taskColors[taskName];
+                }
+            });
+        }
         function updateCurrentDate() {
             const dateStr = currentDate.toLocaleDateString('ko-KR', {
                 year: 'numeric',
@@ -662,6 +972,9 @@
                     break;
                 case 'stats':
                     updateStats();
+                    break;
+                case 'settings':
+                    updateDataInfo();
                     break;
             }
         }
@@ -752,7 +1065,12 @@
         // 폼 초기화
         function resetForm() {
             document.getElementById('task-name').value = '';
-            document.getElementById('task-color').value = '#667eea';
+            const themeColors = {
+                'white': '#ffffff',
+                'gray': '#6c757d', 
+                'dark': '#343a40'
+            };
+            document.getElementById('task-color').value = themeColors[currentTheme];
             document.getElementById('start-hour').value = 6;
             document.getElementById('start-minute').value = 0;
             document.getElementById('end-hour').value = 7;
@@ -858,8 +1176,8 @@
                         <span class="task-time">${timeToString(task.startTime)} - ${timeToString(task.endTime)}</span>
                     </div>
                     <div class="task-actions">
-                        <button class="btn-small btn-primary" onclick="editTask('${dateKey}', ${task.id})">수정</button>
-                        <button class="btn-small btn-danger" onclick="deleteTask('${dateKey}', ${task.id})">삭제</button>
+                        <button class="btn-small btn-primary" onclick="editTask('${dateKey}', ${task.id})" title="수정">✏️</button>
+                        <button class="btn-small btn-danger" onclick="deleteTask('${dateKey}', ${task.id})" title="삭제">🗑️</button>
                     </div>
                 `;
                 container.appendChild(item);
