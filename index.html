@@ -1628,13 +1628,24 @@
             renderTaskList();
         }
 
+        // (필수) 오늘 날짜 표시 함수가 누락되어 있어 추가
+        function updateCurrentDate() {
+            const el = document.getElementById('current-date');
+            if (!el) return;
+            const dateStr = currentDate.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
+            });
+            el.textContent = dateStr;
+        }
     </script>
     <script>
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
-        } else {
+        // 무조건 DOMContentLoaded에서만 init 실행
+        document.addEventListener('DOMContentLoaded', function() {
             init();
-        }
+        });
     </script>
 </body>
 </html>
