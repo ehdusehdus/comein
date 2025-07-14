@@ -707,19 +707,16 @@
         }
 
         function resetToDefaultColors() {
-            // 기본 흰색으로 리셋
-            const defaultColor = '#ffffff';
+            // 기본 색상으로 리셋
+            const defaultColor = '#6c757d';
             currentTheme = defaultColor;
-            
             // UI 즉시 업데이트
             document.getElementById('interface-color').value = defaultColor;
             document.getElementById('color-preview').style.backgroundColor = defaultColor;
             document.documentElement.style.setProperty('--primary-color', defaultColor);
-            
             // 모든 인터페이스 색상 업데이트
             updateInterfaceColors();
             saveSettings();
-            
             // 페이지 새로고침으로 완전히 적용
             setTimeout(() => {
                 location.reload();
