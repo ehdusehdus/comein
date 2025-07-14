@@ -654,6 +654,7 @@
         let slotHeight = 40;
         let fontSize = 12;
         let taskListExpanded = true;
+        let recentColor = localStorage.getItem('timeTracker_recentColor') || '#6c757d';
 
         const colors = [
             '#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe',
@@ -1153,7 +1154,7 @@
         // 할일 삭제
         function deleteTask(dateKey, taskId) {
             if (confirm('정말로 삭제하시겠습니까?')) {
-                tasks[dateKey] = tasks[dateKey].filter(t => t.id == taskId);
+                tasks[dateKey] = tasks[dateKey].filter(t => t.id != taskId);
                 if (tasks[dateKey].length === 0) {
                     delete tasks[dateKey];
                 }
@@ -1166,7 +1167,7 @@
         // 폼 초기화
         function resetForm() {
             document.getElementById('task-name').value = '';
-            document.getElementById('task-color').value = currentTheme;
+            document.getElementById('task-color').value = recentColor;
             document.getElementById('start-hour').value = 6;
             document.getElementById('start-minute').value = 0;
             document.getElementById('end-hour').value = 7;
