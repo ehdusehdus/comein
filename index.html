@@ -899,7 +899,7 @@
 
         function applySettings() {
             // CSS 변수 설정
-            document.documentElement.style.setProperty('--primary-color', currentTheme);
+            document.documentElement.style.setProperty('--primary-color', currentTheme || '#6c757d');
             document.documentElement.style.setProperty('--text-shadow', textShadowEnabled ? '1px 1px 2px rgba(0,0,0,0.5)' : 'none');
             document.documentElement.style.setProperty('--slot-height', slotHeight + 'px');
             document.documentElement.style.setProperty('--font-size', fontSize + 'px');
@@ -940,14 +940,17 @@
 
         // 초기화
         function init() {
+            currentDate = new Date();
+            currentWeek = new Date();
+            currentMonth = new Date();
             loadSettings();
             loadTasks();
             setupTimeSelects();
             setupTaskNameListener();
             updateTaskFrequency();
             updateTaskSuggestions();
-            updateCurrentDate();
-            renderSchedule();
+            updateCurrentDate(); // 무조건 호출
+            renderSchedule();    // 무조건 호출
             renderTaskList();
             updateStats();
         }
