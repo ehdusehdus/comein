@@ -542,8 +542,8 @@
                             <select id="end-minute"></select>
                         </div>
                         <div class="form-btns-right">
-                            <button class="btn btn-secondary" onclick="clearTodayTasks()" title="오늘 일정 전체 삭제">🔄</button>
                             <button class="btn btn-primary" onclick="addTask()" title="할일 추가">➕</button>
+                            <button class="btn btn-secondary" onclick="clearTodayTasks()" title="오늘 일정 전체 삭제">🔄</button>
                         </div>
                     </div>
                 </div>
@@ -624,31 +624,10 @@
                             <button class="reset-btn" onclick="resetToDefaultColors()">기본값으로 복구</button>
                         </div>
                     </div>
-                    
-                    <div class="setting-group">
-                        <label>일정 블록 투명도</label>
-                        <div class="slider-group">
-                            <input type="range" id="opacity-slider" min="0.3" max="1" step="0.1" value="1" onchange="changeOpacity(this.value)">
-                            <span class="slider-value" id="opacity-value">100%</span>
-                        </div>
-                    </div>
-
-                    <div class="setting-group">
-                        <label>시간표 높이</label>
-                        <div class="slider-group">
-                            <input type="range" id="height-slider" min="30" max="80" step="5" value="40" onchange="changeSlotHeight(this.value)">
-                            <span class="slider-value" id="height-value">40px</span>
-                        </div>
-                    </div>
-
-                    <div class="setting-group">
-                        <label>할일 글자 크기</label>
-                        <div class="slider-group">
-                            <input type="range" id="font-slider" min="10" max="16" step="1" value="12" onchange="changeFontSize(this.value)">
-                            <span class="slider-value" id="font-value">12px</span>
-                        </div>
-                    </div>
                 </div>
+
+                <!-- 외관 설정과 데이터 관리 사이에 여백 추가 -->
+                <div style="height: 32px;"></div>
 
                 <div class="settings-section">
                     <h3>📊 데이터 관리</h3>
@@ -691,7 +670,6 @@
         let editingTask = null;
         let colorIndex = 0;
         let currentTheme = localStorage.getItem('timeTracker_theme') || '#6c757d';
-        let taskOpacity = 1;
         let slotHeight = 40;
         let fontSize = 12;
         let taskListExpanded = true;
@@ -783,18 +761,6 @@
             }, 100);
         }
 
-        function changeOpacity(value) {
-            taskOpacity = parseFloat(value);
-            document.getElementById('opacity-value').textContent = Math.round(taskOpacity * 100) + '%';
-            
-            // 모든 할일 블록에 투명도 적용
-            document.querySelectorAll('.time-slot:not(.empty)').forEach(slot => {
-                slot.style.opacity = taskOpacity;
-            });
-            
-            saveSettings();
-        }
-
         function changeSlotHeight(value) {
             slotHeight = parseInt(value);
             document.getElementById('height-value').textContent = slotHeight + 'px';
@@ -817,7 +783,6 @@
                 taskColors: taskColors,
                 settings: {
                     currentTheme,
-                    taskOpacity,
                     slotHeight,
                     fontSize
                 }
@@ -846,7 +811,6 @@
                     if (data.settings) {
                         const settings = data.settings;
                         if (settings.currentTheme) currentTheme = settings.currentTheme;
-                        if (settings.taskOpacity) taskOpacity = settings.taskOpacity;
                         if (settings.slotHeight) slotHeight = settings.slotHeight;
                         if (settings.fontSize) fontSize = settings.fontSize;
                     }
@@ -874,7 +838,6 @@
         function saveSettings() {
             const settings = {
                 currentTheme,
-                taskOpacity,
                 slotHeight,
                 fontSize
             };
@@ -887,7 +850,6 @@
                 try {
                     const settings = JSON.parse(savedSettings);
                     if (settings.currentTheme) currentTheme = settings.currentTheme;
-                    if (settings.taskOpacity !== undefined) taskOpacity = settings.taskOpacity;
                     if (settings.slotHeight !== undefined) slotHeight = settings.slotHeight;
                     if (settings.fontSize !== undefined) fontSize = settings.fontSize;
                 } catch (error) {
@@ -930,8 +892,6 @@
             if (document.getElementById('interface-color')) {
                 document.getElementById('interface-color').value = currentTheme;
                 document.getElementById('color-preview').style.backgroundColor = currentTheme;
-                document.getElementById('opacity-slider').value = taskOpacity;
-                document.getElementById('opacity-value').textContent = Math.round(taskOpacity * 100) + '%';
                 document.getElementById('height-slider').value = slotHeight;
                 document.getElementById('height-value').textContent = slotHeight + 'px';
                 document.getElementById('font-slider').value = fontSize;
@@ -1353,7 +1313,6 @@
                     if (currentTask) {
                         dayCell.classList.add('has-task');
                         dayCell.style.backgroundColor = currentTask.color;
-                        dayCell.style.opacity = taskOpacity;
                         
                         // 시작 시간에만 텍스트 표시
                         const taskStartHour = Math.floor(currentTask.startTime / 60);
