@@ -472,9 +472,9 @@
 <body>
     <div class="container">
         <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('daily')">일간 뷰</button>
-            <button class="nav-tab" onclick="showTab('weekly')">주간 뷰</button>
-            <button class="nav-tab" onclick="showTab('monthly')">월간 뷰</button>
+            <button class="nav-tab active" onclick="showTab('daily')">일간</button>
+            <button class="nav-tab" onclick="showTab('weekly')">주간</button>
+            <button class="nav-tab" onclick="showTab('monthly')">월간</button>
             <button class="nav-tab" onclick="showTab('stats')">통계</button>
             <button class="nav-tab" onclick="showTab('settings')">설정</button>
         </div>
@@ -699,9 +699,10 @@
         // 설정 관련 함수들
         function changeCustomTheme(color) {
             currentTheme = color;
+            localStorage.setItem('timeTracker_theme', currentTheme);
             
             // CSS 변수 즉시 업데이트
-            document.documentElement.style.setProperty('--primary-color', color);
+            document.documentElement.style.setProperty('--primary-color', currentTheme);
             
             // 색상 미리보기 업데이트
             const preview = document.getElementById('color-preview');
@@ -1618,6 +1619,13 @@
             });
             const el = document.getElementById('current-month');
             if (el) el.textContent = monthStr;
+        }
+
+        function changeDate(days) {
+            currentDate.setDate(currentDate.getDate() + days);
+            updateCurrentDate();
+            renderSchedule();
+            renderTaskList();
         }
 
     </script>
