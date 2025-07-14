@@ -952,10 +952,8 @@
             setupTaskNameListener();
             updateTaskFrequency();
             updateTaskSuggestions();
-            updateCurrentDate(); // 무조건 호출
-            renderSchedule();    // 무조건 호출
-            renderTaskList();
-            updateStats();
+            // showTab('daily')만 호출하면 나머지는 showTab에서 처리됨
+            showTab('daily');
         }
 
         // 로컬 스토리지에서 데이터 로드
@@ -1582,6 +1580,7 @@
             document.getElementById(tabName + '-view').classList.remove('hidden');
             switch(tabName) {
                 case 'daily':
+                    currentDate = new Date(); // 무조건 오늘 날짜로 세팅
                     updateCurrentDate();
                     renderSchedule();
                     renderTaskList();
