@@ -1580,7 +1580,7 @@
             document.getElementById(tabName + '-view').classList.remove('hidden');
             switch(tabName) {
                 case 'daily':
-                    // currentDate를 건드리지 않음!
+                    setupTimeSelects(); // 일간 뷰 진입 시마다 select 옵션 재생성
                     updateCurrentDate();
                     renderSchedule();
                     renderTaskList();
