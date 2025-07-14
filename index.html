@@ -660,7 +660,7 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="task-name">할일</label>
-                                <input type="text" id="task-name" placeholder="할일 입력" maxlength="15" list="task-suggestions">
+                                <input type="text" id="task-name" placeholder="입력" maxlength="15" list="task-suggestions">
                                 <datalist id="task-suggestions"></datalist>
                             </div>
                             <div class="form-group">
@@ -1858,7 +1858,20 @@
             weekStart.setDate(weekStart.getDate() - weekStart.getDay());
             const weekEnd = new Date(weekStart);
             weekEnd.setDate(weekEnd.getDate() + 6);
-            const weekStr = `${weekStart.getFullYear()}년 ${weekStart.getMonth() + 1}월 ${weekStart.getDate()}일 - ${weekEnd.getMonth() + 1}월 ${weekEnd.getDate()}일`;
+            
+            // 일간과 동일한 형식으로 변경
+            const startY = String(weekStart.getFullYear()).slice(2);
+            const startM = String(weekStart.getMonth() + 1).padStart(2, '0');
+            const startD = String(weekStart.getDate()).padStart(2, '0');
+            const startWeekday = ['일','월','화','수','목','금','토'][weekStart.getDay()];
+            
+            const endY = String(weekEnd.getFullYear()).slice(2);
+            const endM = String(weekEnd.getMonth() + 1).padStart(2, '0');
+            const endD = String(weekEnd.getDate()).padStart(2, '0');
+            const endWeekday = ['일','월','화','수','목','금','토'][weekEnd.getDay()];
+            
+            const weekStr = `${startY}/${startM}/${startD} (${startWeekday}) - ${endY}/${endM}/${endD} (${endWeekday})`;
+            
             const el = document.getElementById('current-week');
             if (el) el.textContent = weekStr;
         }
