@@ -66,6 +66,15 @@
             margin-bottom: 30px;
         }
 
+        .form-section.hidden {
+            display: none;
+        }
+
+        .form-section-toggle {
+            text-align: right;
+            margin-bottom: 10px;
+        }
+
         .form-row {
             display: flex;
             gap: 10px;
@@ -514,7 +523,10 @@
         <div class="content">
             <!-- 일간 뷰 -->
             <div id="daily-view" class="view-content">
-                <div class="form-section">
+                <div class="form-section-toggle" style="margin-bottom: 10px;">
+                    <button class="btn btn-secondary" id="toggle-form-btn" onclick="toggleFormSection()">할일 추가 폼 접기 ▲</button>
+                </div>
+                <div class="form-section" id="form-section">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="task-name">할일</label>
