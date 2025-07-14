@@ -1218,6 +1218,19 @@
             grid.innerHTML = '';
             const dateKey = getDateKey(currentDate);
             const dayTasks = tasks[dateKey] || [];
+            // 각 일정별로 셀 범위 미리 계산
+            const taskCellMap = {};
+            dayTasks.forEach(task => {
+                const startIdx = Math.floor((task.startTime - 360) / 10); // 6:00 = 360분
+                const endIdx = Math.floor((task.endTime - 360) / 10);
+                const cellCount = endIdx - startIdx;
+                const centerIdx = startIdx + Math.floor(cellCount / 2);
+                for (let i = startIdx; i < endIdx; i++) {
+                    taskCellMap[i] = taskCellMap[i] || [];
+                    taskCellMap[i].push({ task, centerIdx });
+                }
+            });
+            let cellIdx = 0;
             for (let hour = 6; hour < 30; hour++) {
                 const displayHour = hour >= 24 ? hour - 24 : hour;
                 // 시간 레이블
@@ -1228,20 +1241,28 @@
                 for (let segment = 0; segment < 6; segment++) {
                     const minute = segment * 10;
                     const timeMinutes = hour * 60 + minute;
-                    // 해당 시간에 할일 찾기
-                    const task = dayTasks.find(t => timeMinutes >= t.startTime && timeMinutes < t.endTime);
-                    const isStart = task && timeMinutes === task.startTime;
-                    const slot = document.createElement('div');
-                    slot.className = task ? 'time-slot' : 'time-slot empty';
-                    if (task) {
+                    // 셀 인덱스
+                    // 6:00 = 0, 6:10 = 1, ...
+                    // 셀에 해당하는 task 찾기
+                    let slot = document.createElement('div');
+                    let found = false;
+                    if (taskCellMap[cellIdx]) {
+                        // 여러 일정이 겹칠 수 있으나, 첫 번째만 표시
+                        const { task, centerIdx } = taskCellMap[cellIdx][0];
+                        slot.className = 'time-slot';
                         slot.style.backgroundColor = task.color;
-                        if (isStart) {
+                        if (cellIdx === centerIdx) {
                             slot.innerHTML = `<span class='time-slot-title-center'>${task.name}</span>`;
                         }
                         slot.onclick = () => editTask(dateKey, task.id);
                         slot.title = `${task.name} (${timeToString(task.startTime)} - ${timeToString(task.endTime)})`;
+                        found = true;
+                    }
+                    if (!found) {
+                        slot.className = 'time-slot empty';
                     }
                     grid.appendChild(slot);
+                    cellIdx++;
                 }
             }
         }
