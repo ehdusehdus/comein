@@ -1248,7 +1248,7 @@
                     // 해당 시간에 시작하는 할일 찾기
                     const task = dayTasks.find(t => t.startTime === timeMinutes);
                     if (task) {
-                        const span = Math.max(1, Math.floor((task.endTime - task.startTime) / 10));
+                        const span = Math.max(1, Math.ceil((task.endTime - task.startTime) / 10));
                         const slot = document.createElement('div');
                         slot.className = 'time-slot';
                         slot.style.backgroundColor = task.color;
