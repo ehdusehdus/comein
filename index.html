@@ -170,7 +170,6 @@
         }
 
         .schedule-grid {
-            position: relative;
             display: grid;
             grid-template-columns: 80px repeat(6, 1fr);
             gap: 1px;
@@ -450,7 +449,7 @@
         }
 
         :root {
-            --primary-color: #6c757d !important;
+            --primary-color: #6c757d;
             --time-slot-color: white;
             --text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
@@ -665,7 +664,6 @@
         let editingTask = null;
         let colorIndex = 0;
         let currentTheme = localStorage.getItem('timeTracker_theme') || '#6c757d';
-        if (!currentTheme) currentTheme = '#6c757d';
         let textShadowEnabled = false;
         let taskOpacity = 1;
         let slotHeight = 40;
@@ -889,9 +887,9 @@
                     if (settings.fontSize !== undefined) fontSize = settings.fontSize;
                 } catch (error) {
                     console.log('설정 로드 오류:', error);
-                    localStorage.removeItem('timeTracker_settings');
                 }
             }
+            
             // theme 별도 복원
             const savedTheme = localStorage.getItem('timeTracker_theme');
             if (savedTheme) currentTheme = savedTheme;
@@ -901,7 +899,6 @@
 
         function applySettings() {
             // CSS 변수 설정
-            if (!currentTheme) currentTheme = '#6c757d';
             document.documentElement.style.setProperty('--primary-color', currentTheme);
             document.documentElement.style.setProperty('--text-shadow', textShadowEnabled ? '1px 1px 2px rgba(0,0,0,0.5)' : 'none');
             document.documentElement.style.setProperty('--slot-height', slotHeight + 'px');
@@ -950,11 +947,9 @@
             updateTaskFrequency();
             updateTaskSuggestions();
             updateCurrentDate();
-            setTimeout(() => {
-                renderSchedule();
-                renderTaskList();
-                updateStats();
-            }, 0);
+            renderSchedule();
+            renderTaskList();
+            updateStats();
         }
 
         // 로컬 스토리지에서 데이터 로드
@@ -963,20 +958,10 @@
             const savedColors = localStorage.getItem('timeTracker_colors');
             
             if (savedTasks) {
-                try {
-                    tasks = JSON.parse(savedTasks);
-                } catch (e) {
-                    tasks = {};
-                    localStorage.removeItem('timeTracker_tasks');
-                }
+                tasks = JSON.parse(savedTasks);
             }
             if (savedColors) {
-                try {
-                    taskColors = JSON.parse(savedColors);
-                } catch (e) {
-                    taskColors = {};
-                    localStorage.removeItem('timeTracker_colors');
-                }
+                taskColors = JSON.parse(savedColors);
             }
         }
 
@@ -1241,75 +1226,52 @@
             grid.innerHTML = '';
             const dateKey = getDateKey(currentDate);
             const dayTasks = tasks[dateKey] || [];
-
-            // 1. 기본 그리드(배경) 생성
+            // 각 일정별로 셀 범위 미리 계산
+            const taskCellMap = {};
+            dayTasks.forEach(task => {
+                const startIdx = Math.floor((task.startTime - 360) / 10); // 6:00 = 360분
+                const endIdx = Math.floor((task.endTime - 360) / 10);
+                const cellCount = endIdx - startIdx;
+                const centerIdx = startIdx + Math.floor(cellCount / 2);
+                for (let i = startIdx; i < endIdx; i++) {
+                    taskCellMap[i] = taskCellMap[i] || [];
+                    taskCellMap[i].push({ task, centerIdx });
+                }
+            });
+            let cellIdx = 0;
             for (let hour = 6; hour < 30; hour++) {
                 const displayHour = hour >= 24 ? hour - 24 : hour;
+                // 시간 레이블
                 const timeLabel = document.createElement('div');
                 timeLabel.className = 'time-label';
                 timeLabel.textContent = `${displayHour.toString().padStart(2, '0')}`;
                 grid.appendChild(timeLabel);
                 for (let segment = 0; segment < 6; segment++) {
-                    const slot = document.createElement('div');
-                    slot.className = 'time-slot empty';
-                    grid.appendChild(slot);
-                }
-            }
-
-            // 2. 일정이 있을 때만 absolute 레이어 추가 (grid의 자식, top/left 0, width/height 100%)
-            let absLayer = document.getElementById('abs-schedule-layer');
-            if (absLayer) absLayer.remove();
-            if (dayTasks.length > 0) {
-                absLayer = document.createElement('div');
-                absLayer.id = 'abs-schedule-layer';
-                absLayer.style.position = 'absolute';
-                absLayer.style.top = 0;
-                absLayer.style.left = 0;
-                absLayer.style.width = '100%';
-                absLayer.style.height = '100%';
-                absLayer.style.pointerEvents = 'none';
-                absLayer.style.zIndex = 10;
-                grid.appendChild(absLayer);
-
-                // 일정 겹침 단순 처리: 같은 시간대 여러 일정이면 오른쪽으로 밀기
-                const slotHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--slot-height')) || 40;
-                const gridColCount = 7; // 시간+6칸
-                const colWidth = grid.offsetWidth / gridColCount;
-                let taskLayers = [];
-                dayTasks.forEach((task, idx) => {
-                    const startIdx = Math.max(0, Math.floor((task.startTime - 360) / 10));
-                    const endIdx = Math.max(0, Math.floor((task.endTime - 360) / 10));
-                    const top = startIdx * slotHeight;
-                    const height = (endIdx - startIdx) * slotHeight;
-                    let layer = 0;
-                    while (taskLayers.some(t => !(endIdx <= t.startIdx || startIdx >= t.endIdx) && t.layer === layer)) {
-                        layer++;
+                    const minute = segment * 10;
+                    const timeMinutes = hour * 60 + minute;
+                    // 셀 인덱스
+                    // 6:00 = 0, 6:10 = 1, ...
+                    // 셀에 해당하는 task 찾기
+                    let slot = document.createElement('div');
+                    let found = false;
+                    if (taskCellMap[cellIdx]) {
+                        // 여러 일정이 겹칠 수 있으나, 첫 번째만 표시
+                        const { task, centerIdx } = taskCellMap[cellIdx][0];
+                        slot.className = 'time-slot';
+                        slot.style.backgroundColor = task.color;
+                        if (cellIdx === centerIdx) {
+                            slot.innerHTML = `<span class='time-slot-title-center'>${task.name}</span>`;
+                        }
+                        slot.onclick = () => editTask(dateKey, task.id);
+                        slot.title = `${task.name} (${timeToString(task.startTime)} - ${timeToString(task.endTime)})`;
+                        found = true;
                     }
-                    taskLayers.push({startIdx, endIdx, layer});
-                    const left = colWidth + layer * 10;
-                    const width = colWidth * 6 - layer * 20;
-                    const absDiv = document.createElement('div');
-                    absDiv.style.position = 'absolute';
-                    absDiv.style.top = top + 'px';
-                    absDiv.style.left = left + 'px';
-                    absDiv.style.width = width + 'px';
-                    absDiv.style.height = height + 'px';
-                    absDiv.style.background = task.color;
-                    absDiv.style.borderRadius = '8px';
-                    absDiv.style.display = 'flex';
-                    absDiv.style.alignItems = 'center';
-                    absDiv.style.justifyContent = 'center';
-                    absDiv.style.fontWeight = 'bold';
-                    absDiv.style.fontSize = '14px';
-                    absDiv.style.color = 'black';
-                    absDiv.style.boxShadow = '0 2px 6px rgba(0,0,0,0.08)';
-                    absDiv.style.pointerEvents = 'auto';
-                    absDiv.style.cursor = 'pointer';
-                    absDiv.title = `${task.name} (${timeToString(task.startTime)} - ${timeToString(task.endTime)})`;
-                    absDiv.innerHTML = `<span>${task.name}</span>`;
-                    absDiv.onclick = (e) => { e.stopPropagation(); editTask(dateKey, task.id); };
-                    absLayer.appendChild(absDiv);
-                });
+                    if (!found) {
+                        slot.className = 'time-slot empty';
+                    }
+                    grid.appendChild(slot);
+                    cellIdx++;
+                }
             }
         }
 
@@ -1578,83 +1540,27 @@
                 return;
             }
 
-            // 각 카테고리별 총 시간 계산
-            const categoryMinutes = {};
-            Object.keys(tasks).forEach(dateKey => {
-                tasks[dateKey].forEach(task => {
-                    categoryMinutes[task.name] = (categoryMinutes[task.name] || 0) + (task.endTime - task.startTime);
-                });
-            });
-
             const maxFrequency = Math.max(...Object.values(taskFrequency));
+            
             Object.entries(taskFrequency)
                 .sort(([,a], [,b]) => b - a)
                 .slice(0, 10)
                 .forEach(([taskName, frequency]) => {
                     const barContainer = document.createElement('div');
                     barContainer.className = 'chart-bar';
+                    
                     const percentage = (frequency / maxFrequency) * 100;
-                    // 총 시간 표시 (시:분)
-                    const totalMin = categoryMinutes[taskName] || 0;
-                    const hour = Math.floor(totalMin / 60);
-                    const min = totalMin % 60;
-                    const timeStr = hour > 0 ? `${hour}h ${min}m` : `${min}m`;
+                    
                     barContainer.innerHTML = `
                         <div class="chart-label">${taskName}</div>
                         <div class="chart-progress">
                             <div class="chart-fill" style="width: ${percentage}%; background-color: var(--primary-color)"></div>
                         </div>
-                        <div class="chart-value">${frequency}회<br><span style='color:#495057;font-size:11px;'>${timeStr}</span></div>
+                        <div class="chart-value">${frequency}회</div>
                     `;
+                    
                     chartContainer.appendChild(barContainer);
                 });
-        }
-
-        // showTab 함수가 정상 동작하도록 event 인자 처리
-        function showTab(tabName) {
-            // 모든 탭 비활성화
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.view-content').forEach(content => {
-                content.classList.add('hidden');
-            });
-
-            // 뷰 전환 시 absolute 일정 레이어 제거
-            const absLayer = document.getElementById('abs-schedule-layer');
-            if (absLayer) absLayer.remove();
-
-            // 선택된 탭 활성화
-            // event.target이 undefined일 수 있으니, 탭 이름으로 직접 처리
-            const tabButtons = document.querySelectorAll('.nav-tab');
-            tabButtons.forEach(tab => {
-                if (tab.textContent.includes(tabName === 'daily' ? '일간' :
-                                  tabName === 'weekly' ? '주간' :
-                                  tabName === 'monthly' ? '월간' :
-                                  tabName === 'stats' ? '통계' :
-                                  tabName === 'settings' ? '설정' : '')) {
-                    tab.classList.add('active');
-                }
-            });
-            document.getElementById(tabName + '-view').classList.remove('hidden');
-
-            // 각 뷰에 맞는 렌더링
-            switch(tabName) {
-                case 'weekly':
-                    updateWeekDisplay();
-                    renderWeekView();
-                    break;
-                case 'monthly':
-                    updateMonthDisplay();
-                    renderMonthView();
-                    break;
-                case 'stats':
-                    updateStats();
-                    break;
-                case 'settings':
-                    updateDataInfo();
-                    break;
-            }
         }
 
     </script>
