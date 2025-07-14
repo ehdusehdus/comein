@@ -170,6 +170,7 @@
         }
 
         .schedule-grid {
+            position: relative;
             display: grid;
             grid-template-columns: 80px repeat(6, 1fr);
             gap: 1px;
@@ -1226,48 +1227,75 @@
             grid.innerHTML = '';
             const dateKey = getDateKey(currentDate);
             const dayTasks = tasks[dateKey] || [];
-            // 각 일정별로 셀 범위 미리 계산
-            const taskCellMap = {};
-            dayTasks.forEach(task => {
-                // 6:00 = 0번째 셀, 6:10 = 1번째 셀 ...
-                let startIdx = Math.max(0, Math.floor((task.startTime - 360) / 10));
-                let endIdx = Math.max(0, Math.floor((task.endTime - 360) / 10));
-                const cellCount = endIdx - startIdx;
-                const centerIdx = startIdx + Math.floor(cellCount / 2);
-                for (let i = startIdx; i < endIdx; i++) {
-                    if (i < 0 || i >= 144) continue; // 6:00~29:50 총 144칸
-                    taskCellMap[i] = taskCellMap[i] || [];
-                    taskCellMap[i].push({ task, centerIdx });
-                }
-            });
-            let cellIdx = 0;
+
+            // 1. 기본 그리드(배경) 생성
             for (let hour = 6; hour < 30; hour++) {
                 const displayHour = hour >= 24 ? hour - 24 : hour;
-                // 시간 레이블
                 const timeLabel = document.createElement('div');
                 timeLabel.className = 'time-label';
                 timeLabel.textContent = `${displayHour.toString().padStart(2, '0')}`;
                 grid.appendChild(timeLabel);
                 for (let segment = 0; segment < 6; segment++) {
-                    let slot = document.createElement('div');
-                    let found = false;
-                    if (taskCellMap[cellIdx]) {
-                        const { task, centerIdx } = taskCellMap[cellIdx][0];
-                        slot.className = 'time-slot';
-                        slot.style.backgroundColor = task.color;
-                        if (cellIdx === centerIdx) {
-                            slot.innerHTML = `<span class='time-slot-title-center'>${task.name}</span>`;
-                        }
-                        slot.onclick = () => editTask(dateKey, task.id);
-                        slot.title = `${task.name} (${timeToString(task.startTime)} - ${timeToString(task.endTime)})`;
-                        found = true;
-                    }
-                    if (!found) {
-                        slot.className = 'time-slot empty';
-                    }
+                    const slot = document.createElement('div');
+                    slot.className = 'time-slot empty';
                     grid.appendChild(slot);
-                    cellIdx++;
                 }
+            }
+
+            // 2. 일정이 있을 때만 absolute 레이어 추가
+            let absLayer = document.getElementById('abs-schedule-layer');
+            if (absLayer) absLayer.remove();
+            if (dayTasks.length > 0) {
+                absLayer = document.createElement('div');
+                absLayer.id = 'abs-schedule-layer';
+                absLayer.style.position = 'absolute';
+                absLayer.style.top = grid.offsetTop + 'px';
+                absLayer.style.left = grid.offsetLeft + 'px';
+                absLayer.style.width = grid.offsetWidth + 'px';
+                absLayer.style.height = grid.offsetHeight + 'px';
+                absLayer.style.pointerEvents = 'none';
+                absLayer.style.zIndex = 10;
+                grid.parentElement.appendChild(absLayer);
+
+                // 일정 겹침 단순 처리: 같은 시간대 여러 일정이면 오른쪽으로 밀기
+                const slotHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--slot-height')) || 40;
+                const gridColCount = 7; // 시간+6칸
+                const colWidth = grid.offsetWidth / gridColCount;
+                let taskLayers = [];
+                dayTasks.forEach((task, idx) => {
+                    const startIdx = Math.max(0, Math.floor((task.startTime - 360) / 10));
+                    const endIdx = Math.max(0, Math.floor((task.endTime - 360) / 10));
+                    const top = startIdx * slotHeight;
+                    const height = (endIdx - startIdx) * slotHeight;
+                    let layer = 0;
+                    while (taskLayers.some(t => !(endIdx <= t.startIdx || startIdx >= t.endIdx) && t.layer === layer)) {
+                        layer++;
+                    }
+                    taskLayers.push({startIdx, endIdx, layer});
+                    const left = colWidth + layer * 10;
+                    const width = colWidth * 6 - layer * 20;
+                    const absDiv = document.createElement('div');
+                    absDiv.style.position = 'absolute';
+                    absDiv.style.top = top + 'px';
+                    absDiv.style.left = left + 'px';
+                    absDiv.style.width = width + 'px';
+                    absDiv.style.height = height + 'px';
+                    absDiv.style.background = task.color;
+                    absDiv.style.borderRadius = '8px';
+                    absDiv.style.display = 'flex';
+                    absDiv.style.alignItems = 'center';
+                    absDiv.style.justifyContent = 'center';
+                    absDiv.style.fontWeight = 'bold';
+                    absDiv.style.fontSize = '14px';
+                    absDiv.style.color = 'black';
+                    absDiv.style.boxShadow = '0 2px 6px rgba(0,0,0,0.08)';
+                    absDiv.style.pointerEvents = 'auto';
+                    absDiv.style.cursor = 'pointer';
+                    absDiv.title = `${task.name} (${timeToString(task.startTime)} - ${timeToString(task.endTime)})`;
+                    absDiv.innerHTML = `<span>${task.name}</span>`;
+                    absDiv.onclick = (e) => { e.stopPropagation(); editTask(dateKey, task.id); };
+                    absLayer.appendChild(absDiv);
+                });
             }
         }
 
@@ -1569,15 +1597,19 @@
                 content.classList.add('hidden');
             });
 
+            // 뷰 전환 시 absolute 일정 레이어 제거
+            const absLayer = document.getElementById('abs-schedule-layer');
+            if (absLayer) absLayer.remove();
+
             // 선택된 탭 활성화
             // event.target이 undefined일 수 있으니, 탭 이름으로 직접 처리
             const tabButtons = document.querySelectorAll('.nav-tab');
             tabButtons.forEach(tab => {
                 if (tab.textContent.includes(tabName === 'daily' ? '일간' :
-                                      tabName === 'weekly' ? '주간' :
-                                      tabName === 'monthly' ? '월간' :
-                                      tabName === 'stats' ? '통계' :
-                                      tabName === 'settings' ? '설정' : '')) {
+                                  tabName === 'weekly' ? '주간' :
+                                  tabName === 'monthly' ? '월간' :
+                                  tabName === 'stats' ? '통계' :
+                                  tabName === 'settings' ? '설정' : '')) {
                     tab.classList.add('active');
                 }
             });
