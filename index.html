@@ -1383,6 +1383,8 @@
                         border: ${date.getMonth() === month ? 'none' : '1px solid #f8f9fa'};
                         opacity: ${date.getMonth() === month ? '1' : '0.3'};
                         cursor: pointer;
+                        display: flex;
+                        flex-direction: column;
                     `;
 
                     // 날짜 표시
@@ -1395,8 +1397,17 @@
                     dateSpan.textContent = date.getDate();
                     dayCell.appendChild(dateSpan);
 
-                    // 할일 표시 (flex로 제목/시간 분리)
-                    dayTasks.slice(0, 3).forEach(task => {
+                    // 동적으로 최대 표시 개수 계산 (칸 가로폭 기준)
+                    // 임시로 1개만 보이게, 실제로는 칸의 width 측정 후 조절 가능
+                    // 일단 1개만 보이게(모바일/좁은 칸 대응)
+                    let maxShow = 1;
+                    // 칸이 충분히 넓으면 2~3개까지 보이게
+                    // (실제 width 측정은 렌더 후 setTimeout 등으로 가능하지만, 여기선 반응형 예시)
+                    // dayCell.offsetWidth는 아직 0이므로, window.innerWidth로 대략 추정
+                    if (window.innerWidth > 900) maxShow = 3;
+                    else if (window.innerWidth > 600) maxShow = 2;
+
+                    dayTasks.slice(0, maxShow).forEach(task => {
                         const taskDiv = document.createElement('div');
                         taskDiv.style.cssText = `
                             background: ${task.color};
@@ -1426,14 +1437,15 @@
                         dayCell.appendChild(taskDiv);
                     });
 
-                    if (dayTasks.length > 3) {
+                    // 칸이 좁으면 +N개 더 표시 생략
+                    if (dayTasks.length > maxShow && maxShow > 1) {
                         const moreDiv = document.createElement('div');
                         moreDiv.style.cssText = `
                             color: #6c757d;
                             font-size: 10px;
                             margin-top: 2px;
                         `;
-                        moreDiv.textContent = `+${dayTasks.length - 3}개 더`;
+                        moreDiv.textContent = `+${dayTasks.length - maxShow}개 더`;
                         dayCell.appendChild(moreDiv);
                     }
 
