@@ -1353,13 +1353,22 @@
         // 오늘 일정 전체 삭제
         function clearTodayTasks() {
             const dateKey = getDateKey(currentDate);
+            console.log('리셋 버튼 클릭 - 날짜키:', dateKey); // 디버깅용
+            console.log('해당 날짜 할일들:', tasks[dateKey]); // 디버깅용
+            
             if (tasks[dateKey] && tasks[dateKey].length > 0) {
                 if (confirm('오늘의 모든 일정을 삭제하시겠습니까?')) {
+                    console.log('사용자 확인 완료, 삭제 진행'); // 디버깅용
                     delete tasks[dateKey];
                     saveTasks();
+                    updateTaskFrequency();
+                    updateTaskSuggestions();
                     renderSchedule();
                     renderTaskList();
+                    console.log('삭제 완료'); // 디버깅용
                 }
+            } else {
+                alert('오늘 삭제할 일정이 없습니다.');
             }
         }
 
