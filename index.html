@@ -1600,6 +1600,25 @@
             }
         }
 
+        function updateWeekDisplay() {
+            const weekStart = new Date(currentWeek);
+            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekEnd.getDate() + 6);
+            const weekStr = `${weekStart.getFullYear()}년 ${weekStart.getMonth() + 1}월 ${weekStart.getDate()}일 - ${weekEnd.getMonth() + 1}월 ${weekEnd.getDate()}일`;
+            const el = document.getElementById('current-week');
+            if (el) el.textContent = weekStr;
+        }
+
+        function updateMonthDisplay() {
+            const monthStr = currentMonth.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long'
+            });
+            const el = document.getElementById('current-month');
+            if (el) el.textContent = monthStr;
+        }
+
     </script>
     <script>
         if (document.readyState === 'loading') {
