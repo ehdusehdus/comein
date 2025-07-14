@@ -211,6 +211,14 @@
             text-align: center;
             display: block;
         }
+        .time-slot-title-center {
+            width: 100%;
+            text-align: center;
+            display: block;
+            color: #222 !important;
+            text-shadow: none !important;
+            font-weight: 600;
+        }
 
         .time-slot.empty {
             background: #f8f9fa;
@@ -1209,46 +1217,41 @@
         function renderSchedule() {
             const grid = document.getElementById('schedule-grid');
             grid.innerHTML = '';
-
             const dateKey = getDateKey(currentDate);
             const dayTasks = tasks[dateKey] || [];
-
             // 시간별로 행 생성 (06:00 ~ 다음날 06:00)
+            const skipSlots = {};
             for (let hour = 6; hour < 30; hour++) {
                 const displayHour = hour >= 24 ? hour - 24 : hour;
-                
                 // 시간 레이블
                 const timeLabel = document.createElement('div');
                 timeLabel.className = 'time-label';
                 timeLabel.textContent = `${displayHour.toString().padStart(2, '0')}`;
                 grid.appendChild(timeLabel);
-
-                // 10분 단위 6칸
                 for (let segment = 0; segment < 6; segment++) {
                     const minute = segment * 10;
                     const timeMinutes = hour * 60 + minute;
-                    
-                    const slot = document.createElement('div');
-                    slot.className = 'time-slot empty';
-                    
-                    // 해당 시간에 할일 찾기
-                    const task = dayTasks.find(t => 
-                        timeMinutes >= t.startTime && timeMinutes < t.endTime
-                    );
-
+                    if (skipSlots[timeMinutes]) continue;
+                    // 해당 시간에 시작하는 할일 찾기
+                    const task = dayTasks.find(t => t.startTime === timeMinutes);
                     if (task) {
+                        const span = Math.max(1, Math.floor((task.endTime - task.startTime) / 10));
+                        const slot = document.createElement('div');
                         slot.className = 'time-slot';
                         slot.style.backgroundColor = task.color;
-                        
-                        // 시작 시간에만 텍스트 표시
-                        if (timeMinutes === task.startTime) {
-                            slot.innerHTML = `<span class="time-slot-title">${task.name}</span>`;
-                        }
+                        slot.style.gridColumn = `span ${span}`;
+                        slot.innerHTML = `<span class='time-slot-title-center'>${task.name}</span>`;
                         slot.onclick = () => editTask(dateKey, task.id);
                         slot.title = `${task.name} (${timeToString(task.startTime)} - ${timeToString(task.endTime)})`;
+                        grid.appendChild(slot);
+                        for (let s = 1; s < span; s++) {
+                            skipSlots[timeMinutes + s * 10] = true;
+                        }
+                    } else {
+                        const slot = document.createElement('div');
+                        slot.className = 'time-slot empty';
+                        grid.appendChild(slot);
                     }
-
-                    grid.appendChild(slot);
                 }
             }
         }
@@ -1529,8 +1532,6 @@
                 });
         }
 
-        // 페이지 로드 시 초기화
-        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
