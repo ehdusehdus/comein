@@ -112,7 +112,6 @@
             align-items: flex-end;
             margin-left: auto;
             gap: 6px;
-            margin-top: 10px;
         }
 
         .form-group input:focus, .form-group select:focus {
@@ -177,10 +176,6 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
-        }
-
-        .date-nav-btn.today-btn {
-            font-size: 13px;
         }
 
         .date-nav-btn:hover {
@@ -477,15 +472,13 @@
         :root {
             --primary-color: #6c757d;
             --time-slot-color: white;
+            --text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
 
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: row;
                 gap: 8px;
-            }
-            .form-btns-right {
-                margin-top: 16px;
             }
             
             .week-grid {
@@ -494,9 +487,6 @@
             
             .stats-grid {
                 grid-template-columns: 1fr;
-            }
-            .date-navigator {
-                gap: 8px;
             }
         }
     </style>
@@ -542,8 +532,8 @@
                             <select id="end-minute"></select>
                         </div>
                         <div class="form-btns-right">
-                            <button class="btn btn-primary" onclick="addTask()" title="할일 추가">➕</button>
                             <button class="btn btn-secondary" onclick="clearTodayTasks()" title="오늘 일정 전체 삭제">🔄</button>
+                            <button class="btn btn-primary" onclick="addTask()" title="할일 추가">➕</button>
                         </div>
                     </div>
                 </div>
@@ -552,7 +542,7 @@
                     <button class="date-nav-btn" onclick="changeDate(-1)" title="이전 날">◀</button>
                     <div class="current-date" id="current-date"></div>
                     <button class="date-nav-btn" onclick="changeDate(1)" title="다음 날">▶</button>
-                    <button class="date-nav-btn today-btn" onclick="goToToday()" title="오늘로 이동">오늘</button>
+                    <button class="date-nav-btn" onclick="goToToday()" title="오늘로 이동">오늘</button>
                 </div>
 
                 <div class="task-list">
@@ -624,10 +614,39 @@
                             <button class="reset-btn" onclick="resetToDefaultColors()">기본값으로 복구</button>
                         </div>
                     </div>
-                </div>
+                    
+                    <div class="setting-group">
+                        <label>텍스트 그림자</label>
+                        <div class="toggle-options">
+                            <button class="toggle-btn active" data-shadow="off" onclick="toggleTextShadow(false)">끄기</button>
+                            <button class="toggle-btn" data-shadow="on" onclick="toggleTextShadow(true)">켜기</button>
+                        </div>
+                    </div>
 
-                <!-- 외관 설정과 데이터 관리 사이에 여백 추가 -->
-                <div style="height: 32px;"></div>
+                    <div class="setting-group">
+                        <label>일정 블록 투명도</label>
+                        <div class="slider-group">
+                            <input type="range" id="opacity-slider" min="0.3" max="1" step="0.1" value="1" onchange="changeOpacity(this.value)">
+                            <span class="slider-value" id="opacity-value">100%</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label>시간표 높이</label>
+                        <div class="slider-group">
+                            <input type="range" id="height-slider" min="30" max="80" step="5" value="40" onchange="changeSlotHeight(this.value)">
+                            <span class="slider-value" id="height-value">40px</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label>할일 글자 크기</label>
+                        <div class="slider-group">
+                            <input type="range" id="font-slider" min="10" max="16" step="1" value="12" onchange="changeFontSize(this.value)">
+                            <span class="slider-value" id="font-value">12px</span>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="settings-section">
                     <h3>📊 데이터 관리</h3>
@@ -670,6 +689,8 @@
         let editingTask = null;
         let colorIndex = 0;
         let currentTheme = localStorage.getItem('timeTracker_theme') || '#6c757d';
+        let textShadowEnabled = false;
+        let taskOpacity = 1;
         let slotHeight = 40;
         let fontSize = 12;
         let taskListExpanded = true;
@@ -761,6 +782,36 @@
             }, 100);
         }
 
+        function toggleTextShadow(enabled) {
+            textShadowEnabled = enabled;
+            const shadowValue = enabled ? '1px 1px 2px rgba(0,0,0,0.5)' : 'none';
+            const colorValue = enabled ? 'white' : '#222';
+            document.documentElement.style.setProperty('--text-shadow', shadowValue);
+            document.documentElement.style.setProperty('--time-slot-color', colorValue);
+            
+            // 버튼 상태 업데이트
+            document.querySelectorAll('.toggle-btn[data-shadow]').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.shadow === (enabled ? 'on' : 'off')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            saveSettings();
+        }
+
+        function changeOpacity(value) {
+            taskOpacity = parseFloat(value);
+            document.getElementById('opacity-value').textContent = Math.round(taskOpacity * 100) + '%';
+            
+            // 모든 할일 블록에 투명도 적용
+            document.querySelectorAll('.time-slot:not(.empty)').forEach(slot => {
+                slot.style.opacity = taskOpacity;
+            });
+            
+            saveSettings();
+        }
+
         function changeSlotHeight(value) {
             slotHeight = parseInt(value);
             document.getElementById('height-value').textContent = slotHeight + 'px';
@@ -783,6 +834,8 @@
                 taskColors: taskColors,
                 settings: {
                     currentTheme,
+                    textShadowEnabled,
+                    taskOpacity,
                     slotHeight,
                     fontSize
                 }
@@ -811,6 +864,8 @@
                     if (data.settings) {
                         const settings = data.settings;
                         if (settings.currentTheme) currentTheme = settings.currentTheme;
+                        if (settings.textShadowEnabled !== undefined) textShadowEnabled = settings.textShadowEnabled;
+                        if (settings.taskOpacity) taskOpacity = settings.taskOpacity;
                         if (settings.slotHeight) slotHeight = settings.slotHeight;
                         if (settings.fontSize) fontSize = settings.fontSize;
                     }
@@ -838,6 +893,8 @@
         function saveSettings() {
             const settings = {
                 currentTheme,
+                textShadowEnabled,
+                taskOpacity,
                 slotHeight,
                 fontSize
             };
@@ -850,6 +907,8 @@
                 try {
                     const settings = JSON.parse(savedSettings);
                     if (settings.currentTheme) currentTheme = settings.currentTheme;
+                    if (settings.textShadowEnabled !== undefined) textShadowEnabled = settings.textShadowEnabled;
+                    if (settings.taskOpacity !== undefined) taskOpacity = settings.taskOpacity;
                     if (settings.slotHeight !== undefined) slotHeight = settings.slotHeight;
                     if (settings.fontSize !== undefined) fontSize = settings.fontSize;
                 } catch (error) {
@@ -867,6 +926,7 @@
         function applySettings() {
             // CSS 변수 설정
             document.documentElement.style.setProperty('--primary-color', currentTheme || '#6c757d');
+            document.documentElement.style.setProperty('--text-shadow', textShadowEnabled ? '1px 1px 2px rgba(0,0,0,0.5)' : 'none');
             document.documentElement.style.setProperty('--slot-height', slotHeight + 'px');
             document.documentElement.style.setProperty('--font-size', fontSize + 'px');
             
@@ -892,10 +952,15 @@
             if (document.getElementById('interface-color')) {
                 document.getElementById('interface-color').value = currentTheme;
                 document.getElementById('color-preview').style.backgroundColor = currentTheme;
+                document.getElementById('opacity-slider').value = taskOpacity;
+                document.getElementById('opacity-value').textContent = Math.round(taskOpacity * 100) + '%';
                 document.getElementById('height-slider').value = slotHeight;
                 document.getElementById('height-value').textContent = slotHeight + 'px';
                 document.getElementById('font-slider').value = fontSize;
                 document.getElementById('font-value').textContent = fontSize + 'px';
+                
+                // 토글 버튼 상태 설정
+                toggleTextShadow(textShadowEnabled);
             }
         }
 
@@ -1255,7 +1320,7 @@
                     <div class="task-info">
                         <div class="task-color" style="background-color: ${task.color}"></div>
                         <span class="task-name">${task.name}</span>
-                        <span class="task-time" style="color: ${task.color}">${timeToString(task.startTime)} - ${timeToString(task.endTime)}</span>
+                        <span class="task-time">${timeToString(task.startTime)} - ${timeToString(task.endTime)}</span>
                     </div>
                     <div class="task-actions">
                         <button class="btn-small btn-primary" onclick="editTask('${dateKey}', ${task.id})" title="수정">✏️</button>
@@ -1313,6 +1378,7 @@
                     if (currentTask) {
                         dayCell.classList.add('has-task');
                         dayCell.style.backgroundColor = currentTask.color;
+                        dayCell.style.opacity = taskOpacity;
                         
                         // 시작 시간에만 텍스트 표시
                         const taskStartHour = Math.floor(currentTask.startTime / 60);
@@ -1599,21 +1665,15 @@
         function updateCurrentDate() {
             const el = document.getElementById('current-date');
             if (!el) return;
-            // '25/07/15 (화)' 형식으로 표시 (yy/MM/dd (요일))
+            // '250715(화)' 형식으로 표시 (yyMMdd(요일))
             const y = String(currentDate.getFullYear()).slice(2);
             const m = String(currentDate.getMonth() + 1).padStart(2, '0');
             const d = String(currentDate.getDate()).padStart(2, '0');
             const weekday = ['일','월','화','수','목','금','토'][currentDate.getDay()];
-            el.textContent = `${y}/${m}/${d} (${weekday})`;
+            el.textContent = `${y}${m}${d}(${weekday})`;
         }
     </script>
     <script>
-        // 주간 이동 함수 추가
-        function changeWeek(weeks) {
-            currentWeek.setDate(currentWeek.getDate() + weeks * 7);
-            updateWeekDisplay();
-            renderWeekView();
-        }
         // 무조건 DOMContentLoaded에서만 init 실행
         document.addEventListener('DOMContentLoaded', function() {
             init();
