@@ -1280,8 +1280,8 @@
                         <span class="task-time">${timeToString(task.startTime)} - ${timeToString(task.endTime)}</span>
                     </div>
                     <div class="task-actions">
-                        <button class="btn-small btn-primary" onclick="editTask('${dateKey}', '${task.id}')" title="수정">✏️</button>
-                        <button class="btn-small btn-danger" onclick="deleteTask('${dateKey}', '${task.id}')" title="삭제">🗑️</button>
+                        <button class="btn-small btn-primary" onclick="editTask('${dateKey}', ${task.id})" title="수정">✏️</button>
+                        <button class="btn-small btn-danger" onclick="deleteTask('${dateKey}', ${task.id})" title="삭제">🗑️</button>
                     </div>
                 `;
                 container.appendChild(item);
