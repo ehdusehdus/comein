@@ -510,7 +510,7 @@
                         </div>
                     </div>
                     <button class="btn btn-primary" onclick="addTask()" title="할일 추가">➕</button>
-                    <button class="btn btn-secondary" onclick="resetForm()" title="폼 초기화">🔄</button>
+                    <button class="btn btn-secondary" onclick="clearTodayTasks()" title="오늘 일정 전체 삭제">🔄</button>
                 </div>
 
                 <div class="date-navigator">
@@ -938,6 +938,7 @@
 
         // 초기화
         function init() {
+            loadSettings();
             loadTasks();
             setupTimeSelects();
             updateCurrentDate();
@@ -1159,13 +1160,29 @@
         function editTask(dateKey, taskId) {
             const task = tasks[dateKey].find(t => t.id === taskId);
             if (!task) return;
-
             editingTask = task;
             document.getElementById('task-name').value = task.name;
             document.getElementById('task-color').value = task.color;
-            document.getElementById('start-hour').value = Math.floor(task.startTime / 60);
+            // 시간 select option이 없으면 추가
+            const startHourSel = document.getElementById('start-hour');
+            const endHourSel = document.getElementById('end-hour');
+            const startHourVal = Math.floor(task.startTime / 60);
+            const endHourVal = Math.floor(task.endTime / 60);
+            if (!Array.from(startHourSel.options).some(opt => parseInt(opt.value) === startHourVal)) {
+                const opt = document.createElement('option');
+                opt.value = startHourVal;
+                opt.textContent = startHourVal.toString().padStart(2, '0') + '시';
+                startHourSel.appendChild(opt);
+            }
+            if (!Array.from(endHourSel.options).some(opt => parseInt(opt.value) === endHourVal)) {
+                const opt = document.createElement('option');
+                opt.value = endHourVal;
+                opt.textContent = endHourVal.toString().padStart(2, '0') + '시';
+                endHourSel.appendChild(opt);
+            }
+            document.getElementById('start-hour').value = startHourVal;
             document.getElementById('start-minute').value = task.startTime % 60;
-            document.getElementById('end-hour').value = Math.floor(task.endTime / 60);
+            document.getElementById('end-hour').value = endHourVal;
             document.getElementById('end-minute').value = task.endTime % 60;
         }
 
@@ -1194,6 +1211,19 @@
             
             // 할일 이름 입력란에 포커스
             document.getElementById('task-name').focus();
+        }
+
+        // 오늘 일정 전체 삭제
+        function clearTodayTasks() {
+            const dateKey = getDateKey(currentDate);
+            if (tasks[dateKey] && tasks[dateKey].length > 0) {
+                if (confirm('오늘의 모든 일정을 삭제하시겠습니까?')) {
+                    delete tasks[dateKey];
+                    saveTasks();
+                    renderSchedule();
+                    renderTaskList();
+                }
+            }
         }
 
         // 전체 삭제
