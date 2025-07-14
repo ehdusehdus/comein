@@ -510,7 +510,6 @@
                         </div>
                     </div>
                     <button class="btn btn-primary" onclick="addTask()" title="할일 추가">➕</button>
-                    <button class="btn btn-danger" onclick="clearAllTasks()" title="전체 삭제">🗑️</button>
                     <button class="btn btn-secondary" onclick="resetForm()" title="폼 초기화">🔄</button>
                 </div>
 
@@ -631,6 +630,13 @@
                             <button class="btn btn-secondary" onclick="exportData()">📤 내보내기</button>
                             <input type="file" id="import-file" accept=".json" style="display: none" onchange="importData(event)">
                             <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">📥 가져오기</button>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label>전체 데이터 삭제</label>
+                        <div class="data-buttons">
+                            <button class="btn btn-danger" onclick="clearAllTasks()">🗑️ 전체 삭제</button>
                         </div>
                     </div>
 
