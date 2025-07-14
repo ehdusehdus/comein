@@ -1153,7 +1153,7 @@
         // 할일 삭제
         function deleteTask(dateKey, taskId) {
             if (confirm('정말로 삭제하시겠습니까?')) {
-                tasks[dateKey] = tasks[dateKey].filter(t => t.id !== taskId);
+                tasks[dateKey] = tasks[dateKey].filter(t => t.id == taskId);
                 if (tasks[dateKey].length === 0) {
                     delete tasks[dateKey];
                 }
@@ -1219,7 +1219,7 @@
                 // 시간 레이블
                 const timeLabel = document.createElement('div');
                 timeLabel.className = 'time-label';
-                timeLabel.textContent = `${displayHour.toString().padStart(2, '0')}시`;
+                timeLabel.textContent = `${displayHour.toString().padStart(2, '0')}`;
                 grid.appendChild(timeLabel);
 
                 // 10분 단위 6칸
@@ -1313,7 +1313,7 @@
                 
                 const timeLabel = document.createElement('div');
                 timeLabel.className = 'time-label';
-                timeLabel.textContent = `${displayHour.toString().padStart(2, '0')}시`;
+                timeLabel.textContent = `${displayHour.toString().padStart(2, '0')}`;
                 grid.appendChild(timeLabel);
 
                 for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
