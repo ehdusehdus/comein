@@ -486,7 +486,8 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="task-name">할일</label>
-                            <input type="text" id="task-name" placeholder="할일을 입력하세요" maxlength="15">
+                            <input type="text" id="task-name" placeholder="할일을 입력하세요" maxlength="15" list="task-suggestions">
+                            <datalist id="task-suggestions"></datalist>
                         </div>
                         <div class="form-group">
                             <label for="task-color">색상</label>
@@ -669,6 +670,7 @@
         let fontSize = 12;
         let taskListExpanded = true;
         let recentColor = localStorage.getItem('timeTracker_recentColor') || '#6c757d';
+        let taskFrequency = {};
 
         const colors = [
             '#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe',
@@ -941,6 +943,9 @@
             loadSettings();
             loadTasks();
             setupTimeSelects();
+            setupTaskNameListener();
+            updateTaskFrequency();
+            updateTaskSuggestions();
             updateCurrentDate();
             renderSchedule();
             renderTaskList();
@@ -1002,108 +1007,52 @@
             });
         }
 
-        // 할일 이름 입력 필드에 이벤트 리스너 추가
+        // (1) 할일 이름 입력 시 색상 자동 적용 및 자동완성 옵션 갱신
         function setupTaskNameListener() {
             const taskNameInput = document.getElementById('task-name');
             const colorInput = document.getElementById('task-color');
+            const datalist = document.getElementById('task-suggestions');
             
             taskNameInput.addEventListener('input', function() {
                 const taskName = this.value.trim();
+                // 색상 자동 적용
                 if (taskName && taskColors[taskName]) {
-                    // 이미 사용된 할일 이름이면 기존 색상으로 설정
                     colorInput.value = taskColors[taskName];
                 }
+                // 자동완성 옵션 갱신
+                updateTaskSuggestions();
             });
         }
-        function updateCurrentDate() {
-            const dateStr = currentDate.toLocaleDateString('ko-KR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                weekday: 'long'
+
+        // (2) 자주 쓴 순서대로 datalist 옵션 갱신
+        function updateTaskSuggestions() {
+            const datalist = document.getElementById('task-suggestions');
+            if (!datalist) return;
+            // taskFrequency를 자주 쓴 순으로 정렬
+            const sortedNames = Object.keys(taskFrequency)
+                .sort((a, b) => taskFrequency[b] - taskFrequency[a]);
+            datalist.innerHTML = '';
+            sortedNames.forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                datalist.appendChild(option);
             });
-            document.getElementById('current-date').textContent = dateStr;
         }
 
-        // 날짜 변경
-        function changeDate(days) {
-            currentDate.setDate(currentDate.getDate() + days);
-            updateCurrentDate();
-            renderSchedule();
-            renderTaskList();
-        }
-
-        // 주 변경
-        function changeWeek(weeks) {
-            currentWeek.setDate(currentWeek.getDate() + (weeks * 7));
-            updateWeekDisplay();
-            renderWeekView();
-        }
-
-        // 월 변경
-        function changeMonth(months) {
-            currentMonth.setMonth(currentMonth.getMonth() + months);
-            updateMonthDisplay();
-            renderMonthView();
-        }
-
-        // 주간 표시 업데이트
-        function updateWeekDisplay() {
-            const weekStart = new Date(currentWeek);
-            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-            const weekEnd = new Date(weekStart);
-            weekEnd.setDate(weekEnd.getDate() + 6);
-            
-            const weekStr = `${weekStart.getFullYear()}년 ${weekStart.getMonth() + 1}월 ${weekStart.getDate()}일 - ${weekEnd.getMonth() + 1}월 ${weekEnd.getDate()}일`;
-            document.getElementById('current-week').textContent = weekStr;
-        }
-
-        // 월간 표시 업데이트
-        function updateMonthDisplay() {
-            const monthStr = currentMonth.toLocaleDateString('ko-KR', {
-                year: 'numeric',
-                month: 'long'
+        // (3) 할일 빈도수 갱신 함수
+        function updateTaskFrequency() {
+            taskFrequency = {};
+            Object.values(tasks).forEach(dayTasks => {
+                dayTasks.forEach(task => {
+                    taskFrequency[task.name] = (taskFrequency[task.name] || 0) + 1;
+                });
             });
-            document.getElementById('current-month').textContent = monthStr;
         }
 
-        // 탭 전환
-        function showTab(tabName) {
-            // 모든 탭 비활성화
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.view-content').forEach(content => {
-                content.classList.add('hidden');
-            });
-
-            // 선택된 탭 활성화
-            event.target.classList.add('active');
-            document.getElementById(tabName + '-view').classList.remove('hidden');
-
-            // 각 뷰에 맞는 렌더링
-            switch(tabName) {
-                case 'weekly':
-                    updateWeekDisplay();
-                    renderWeekView();
-                    break;
-                case 'monthly':
-                    updateMonthDisplay();
-                    renderMonthView();
-                    break;
-                case 'stats':
-                    updateStats();
-                    break;
-                case 'settings':
-                    updateDataInfo();
-                    break;
-            }
-        }
-
-        // 할일 추가
+        // (4) 할일 추가 시 색상 자동 적용 및 빈도수/자동완성 갱신
         function addTask() {
             const name = document.getElementById('task-name').value.trim();
-            const color = document.getElementById('task-color').value;
+            let color = document.getElementById('task-color').value;
             const startHour = parseInt(document.getElementById('start-hour').value);
             const startMinute = parseInt(document.getElementById('start-minute').value);
             const endHour = parseInt(document.getElementById('end-hour').value);
@@ -1112,6 +1061,12 @@
             if (!name) {
                 alert('할일을 입력해주세요.');
                 return;
+            }
+
+            // 색상 자동 적용: 사용자가 색상을 따로 지정하지 않았다면 기존 색상 사용
+            if (taskColors[name] && color === recentColor) {
+                color = taskColors[name];
+                document.getElementById('task-color').value = color;
             }
 
             const startTime = startHour * 60 + startMinute;
@@ -1151,6 +1106,8 @@
             }
 
             saveTasks();
+            updateTaskFrequency();
+            updateTaskSuggestions();
             resetForm();
             renderSchedule();
             renderTaskList();
@@ -1186,7 +1143,7 @@
             document.getElementById('end-minute').value = task.endTime % 60;
         }
 
-        // 할일 삭제
+        // (5) 할일 삭제/수정 시에도 빈도수/자동완성 갱신
         function deleteTask(dateKey, taskId) {
             if (confirm('정말로 삭제하시겠습니까?')) {
                 tasks[dateKey] = tasks[dateKey].filter(t => t.id != taskId);
@@ -1194,6 +1151,8 @@
                     delete tasks[dateKey];
                 }
                 saveTasks();
+                updateTaskFrequency();
+                updateTaskSuggestions();
                 renderSchedule();
                 renderTaskList();
             }
