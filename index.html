@@ -1649,6 +1649,12 @@
         }
     </script>
     <script>
+        // 주간 이동 함수 추가
+        function changeWeek(weeks) {
+            currentWeek.setDate(currentWeek.getDate() + weeks * 7);
+            updateWeekDisplay();
+            renderWeekView();
+        }
         // 무조건 DOMContentLoaded에서만 init 실행
         document.addEventListener('DOMContentLoaded', function() {
             init();
