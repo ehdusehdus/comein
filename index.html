@@ -68,16 +68,17 @@
 
         .form-row {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             margin-bottom: 15px;
             flex-wrap: wrap;
+            align-items: flex-end;
         }
 
         .form-group {
-            flex: 0 0 auto;
-            min-width: 70px;
-            max-width: 120px;
-            margin-right: 6px;
+            flex: 1 1 120px;
+            min-width: 90px;
+            max-width: 180px;
+            margin-right: 0;
         }
 
         .form-group label {
@@ -95,14 +96,22 @@
             font-size: 13px;
             transition: border-color 0.3s ease;
             min-width: 0;
+            box-sizing: border-box;
         }
 
-        /* 시간 선택 select만 더 좁게 */
+        /* 시간 선택 select는 form-group 폭에 맞춰 유동적으로 */
         #start-hour, #start-minute, #end-hour, #end-minute {
-            width: 60px;
-            min-width: 40px;
-            max-width: 70px;
+            width: 100%;
+            min-width: 0;
+            max-width: none;
             display: inline-block;
+        }
+        /* 버튼 오른쪽 정렬 */
+        .form-btns-right {
+            display: flex;
+            align-items: flex-end;
+            margin-left: auto;
+            gap: 6px;
         }
 
         .form-group input:focus, .form-group select:focus {
@@ -467,7 +476,8 @@
 
         @media (max-width: 768px) {
             .form-row {
-                flex-direction: column;
+                flex-direction: row;
+                gap: 8px;
             }
             
             .week-grid {
@@ -520,9 +530,11 @@
                             <label for="end-minute">끝 분</label>
                             <select id="end-minute"></select>
                         </div>
+                        <div class="form-btns-right">
+                            <button class="btn btn-secondary" onclick="clearTodayTasks()" title="오늘 일정 전체 삭제">🔄</button>
+                            <button class="btn btn-primary" onclick="addTask()" title="할일 추가">➕</button>
+                        </div>
                     </div>
-                    <button class="btn btn-primary" onclick="addTask()" title="할일 추가">➕</button>
-                    <button class="btn btn-secondary" onclick="clearTodayTasks()" title="오늘 일정 전체 삭제">🔄</button>
                 </div>
 
                 <div class="date-navigator">
