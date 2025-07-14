@@ -450,7 +450,7 @@
         }
 
         :root {
-            --primary-color: #6c757d;
+            --primary-color: #6c757d !important;
             --time-slot-color: white;
             --text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
@@ -665,6 +665,7 @@
         let editingTask = null;
         let colorIndex = 0;
         let currentTheme = localStorage.getItem('timeTracker_theme') || '#6c757d';
+        if (!currentTheme) currentTheme = '#6c757d';
         let textShadowEnabled = false;
         let taskOpacity = 1;
         let slotHeight = 40;
@@ -900,6 +901,7 @@
 
         function applySettings() {
             // CSS 변수 설정
+            if (!currentTheme) currentTheme = '#6c757d';
             document.documentElement.style.setProperty('--primary-color', currentTheme);
             document.documentElement.style.setProperty('--text-shadow', textShadowEnabled ? '1px 1px 2px rgba(0,0,0,0.5)' : 'none');
             document.documentElement.style.setProperty('--slot-height', slotHeight + 'px');
@@ -948,9 +950,11 @@
             updateTaskFrequency();
             updateTaskSuggestions();
             updateCurrentDate();
-            renderSchedule();
-            renderTaskList();
-            updateStats();
+            setTimeout(() => {
+                renderSchedule();
+                renderTaskList();
+                updateStats();
+            }, 0);
         }
 
         // 로컬 스토리지에서 데이터 로드
@@ -1242,20 +1246,20 @@
                 }
             }
 
-            // 2. 일정이 있을 때만 absolute 레이어 추가
+            // 2. 일정이 있을 때만 absolute 레이어 추가 (grid의 자식, top/left 0, width/height 100%)
             let absLayer = document.getElementById('abs-schedule-layer');
             if (absLayer) absLayer.remove();
             if (dayTasks.length > 0) {
                 absLayer = document.createElement('div');
                 absLayer.id = 'abs-schedule-layer';
                 absLayer.style.position = 'absolute';
-                absLayer.style.top = grid.offsetTop + 'px';
-                absLayer.style.left = grid.offsetLeft + 'px';
-                absLayer.style.width = grid.offsetWidth + 'px';
-                absLayer.style.height = grid.offsetHeight + 'px';
+                absLayer.style.top = 0;
+                absLayer.style.left = 0;
+                absLayer.style.width = '100%';
+                absLayer.style.height = '100%';
                 absLayer.style.pointerEvents = 'none';
                 absLayer.style.zIndex = 10;
-                grid.parentElement.appendChild(absLayer);
+                grid.appendChild(absLayer);
 
                 // 일정 겹침 단순 처리: 같은 시간대 여러 일정이면 오른쪽으로 밀기
                 const slotHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--slot-height')) || 40;
