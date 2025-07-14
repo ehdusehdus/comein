@@ -540,25 +540,6 @@
                             <span class="slider-value" id="height-value">40px</span>
                         </div>
                     </div>
-                </div>
-
-                <div class="settings-section">
-                    <h3>⚙️ 기능 설정</h3>
-                    <div class="setting-group">
-                        <label>시간 표시 형식</label>
-                        <div class="toggle-options">
-                            <button class="toggle-btn active" data-format="24" onclick="changeTimeFormat('24')">24시간</button>
-                            <button class="toggle-btn" data-format="12" onclick="changeTimeFormat('12')">12시간</button>
-                        </div>
-                    </div>
-
-                    <div class="setting-group">
-                        <label>주말 표시</label>
-                        <div class="toggle-options">
-                            <button class="toggle-btn active" data-weekend="show" onclick="toggleWeekend(true)">표시</button>
-                            <button class="toggle-btn" data-weekend="hide" onclick="toggleWeekend(false)">숨기기</button>
-                        </div>
-                    </div>
 
                     <div class="setting-group">
                         <label>할일 글자 크기</label>
@@ -589,25 +570,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="settings-section">
-                    <h3>🎯 고급 설정</h3>
-                    <div class="setting-group">
-                        <label>자동 저장</label>
-                        <div class="toggle-options">
-                            <button class="toggle-btn active" data-autosave="on" onclick="toggleAutoSave(true)">켜기</button>
-                            <button class="toggle-btn" data-autosave="off" onclick="toggleAutoSave(false)">끄기</button>
-                        </div>
-                    </div>
-
-                    <div class="setting-group">
-                        <label>할일 자동완성</label>
-                        <div class="toggle-options">
-                            <button class="toggle-btn active" data-autocomplete="on" onclick="toggleAutoComplete(true)">켜기</button>
-                            <button class="toggle-btn" data-autocomplete="off" onclick="toggleAutoComplete(false)">끄기</button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -625,11 +587,7 @@
         let textShadowEnabled = false;
         let taskOpacity = 1;
         let slotHeight = 40;
-        let timeFormat = '24';
-        let showWeekend = true;
         let fontSize = 12;
-        let autoSave = true;
-        let autoComplete = true;
 
         const colors = [
             '#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe',
@@ -645,7 +603,15 @@
             // 색상 미리보기 업데이트
             document.getElementById('color-preview').style.backgroundColor = color;
             
+            // 모든 인터페이스 요소 업데이트
+            updateInterfaceColors();
             saveSettings();
+        }
+
+        function updateInterfaceColors() {
+            // 모든 버튼과 인터페이스 요소 색상 업데이트
+            renderSchedule();
+            renderTaskList();
         }
 
         function resetToDefaultColors() {
@@ -658,69 +624,43 @@
             const shadowValue = enabled ? '1px 1px 2px rgba(0,0,0,0.5)' : 'none';
             document.documentElement.style.setProperty('--text-shadow', shadowValue);
             
-            updateToggleButtons('.toggle-btn[data-shadow]', enabled ? 'on' : 'off');
+            // 버튼 상태 업데이트
+            document.querySelectorAll('.toggle-btn[data-shadow]').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.shadow === (enabled ? 'on' : 'off')) {
+                    btn.classList.add('active');
+                }
+            });
+            
             saveSettings();
         }
 
         function changeOpacity(value) {
-            taskOpacity = value;
-            document.getElementById('opacity-value').textContent = Math.round(value * 100) + '%';
+            taskOpacity = parseFloat(value);
+            document.getElementById('opacity-value').textContent = Math.round(taskOpacity * 100) + '%';
             
             // 모든 할일 블록에 투명도 적용
             document.querySelectorAll('.time-slot:not(.empty)').forEach(slot => {
-                slot.style.opacity = value;
+                slot.style.opacity = taskOpacity;
             });
             
             saveSettings();
         }
 
         function changeSlotHeight(value) {
-            slotHeight = value;
-            document.getElementById('height-value').textContent = value + 'px';
-            document.documentElement.style.setProperty('--slot-height', value + 'px');
+            slotHeight = parseInt(value);
+            document.getElementById('height-value').textContent = slotHeight + 'px';
+            document.documentElement.style.setProperty('--slot-height', slotHeight + 'px');
             
             saveSettings();
         }
 
-        function changeTimeFormat(format) {
-            timeFormat = format;
-            updateToggleButtons('.toggle-btn[data-format]', format);
-            renderSchedule(); // 시간표 다시 렌더링
-            saveSettings();
-        }
-
-        function toggleWeekend(show) {
-            showWeekend = show;
-            updateToggleButtons('.toggle-btn[data-weekend]', show ? 'show' : 'hide');
-            saveSettings();
-        }
-
         function changeFontSize(value) {
-            fontSize = value;
-            document.getElementById('font-value').textContent = value + 'px';
-            document.documentElement.style.setProperty('--font-size', value + 'px');
+            fontSize = parseInt(value);
+            document.getElementById('font-value').textContent = fontSize + 'px';
+            document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+            
             saveSettings();
-        }
-
-        function toggleAutoSave(enabled) {
-            autoSave = enabled;
-            updateToggleButtons('.toggle-btn[data-autosave]', enabled ? 'on' : 'off');
-            saveSettings();
-        }
-
-        function toggleAutoComplete(enabled) {
-            autoComplete = enabled;
-            updateToggleButtons('.toggle-btn[data-autocomplete]', enabled ? 'on' : 'off');
-            saveSettings();
-        }
-
-        function updateToggleButtons(selector, activeValue) {
-            document.querySelectorAll(selector).forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset[Object.keys(btn.dataset)[0]] === activeValue) {
-                    btn.classList.add('active');
-                }
-            });
         }
 
         function exportData() {
@@ -728,8 +668,11 @@
                 tasks: tasks,
                 taskColors: taskColors,
                 settings: {
-                    currentTheme, textShadowEnabled, taskOpacity, slotHeight,
-                    timeFormat, showWeekend, fontSize, autoSave, autoComplete
+                    currentTheme,
+                    textShadowEnabled,
+                    taskOpacity,
+                    slotHeight,
+                    fontSize
                 }
             };
             
@@ -754,10 +697,12 @@
                     if (data.tasks) tasks = data.tasks;
                     if (data.taskColors) taskColors = data.taskColors;
                     if (data.settings) {
-                        Object.assign({
-                            currentTheme, textShadowEnabled, taskOpacity, slotHeight,
-                            timeFormat, showWeekend, fontSize, autoSave, autoComplete
-                        }, data.settings);
+                        const settings = data.settings;
+                        if (settings.currentTheme) currentTheme = settings.currentTheme;
+                        if (settings.textShadowEnabled !== undefined) textShadowEnabled = settings.textShadowEnabled;
+                        if (settings.taskOpacity) taskOpacity = settings.taskOpacity;
+                        if (settings.slotHeight) slotHeight = settings.slotHeight;
+                        if (settings.fontSize) fontSize = settings.fontSize;
                     }
                     
                     saveTasks();
@@ -782,8 +727,11 @@
 
         function saveSettings() {
             const settings = {
-                currentTheme, textShadowEnabled, taskOpacity, slotHeight,
-                timeFormat, showWeekend, fontSize, autoSave, autoComplete
+                currentTheme,
+                textShadowEnabled,
+                taskOpacity,
+                slotHeight,
+                fontSize
             };
             localStorage.setItem('timeTracker_settings', JSON.stringify(settings));
         }
@@ -791,29 +739,43 @@
         function loadSettings() {
             const savedSettings = localStorage.getItem('timeTracker_settings');
             if (savedSettings) {
-                const settings = JSON.parse(savedSettings);
-                Object.assign({
-                    currentTheme, textShadowEnabled, taskOpacity, slotHeight,
-                    timeFormat, showWeekend, fontSize, autoSave, autoComplete
-                }, settings);
+                try {
+                    const settings = JSON.parse(savedSettings);
+                    if (settings.currentTheme) currentTheme = settings.currentTheme;
+                    if (settings.textShadowEnabled !== undefined) textShadowEnabled = settings.textShadowEnabled;
+                    if (settings.taskOpacity !== undefined) taskOpacity = settings.taskOpacity;
+                    if (settings.slotHeight !== undefined) slotHeight = settings.slotHeight;
+                    if (settings.fontSize !== undefined) fontSize = settings.fontSize;
+                } catch (error) {
+                    console.log('설정 로드 오류:', error);
+                }
             }
             
             // UI에 설정 적용
-            changeCustomTheme(currentTheme);
-            toggleTextShadow(textShadowEnabled);
-            changeOpacity(taskOpacity);
-            changeSlotHeight(slotHeight);
-            changeTimeFormat(timeFormat);
-            toggleWeekend(showWeekend);
-            changeFontSize(fontSize);
-            toggleAutoSave(autoSave);
-            toggleAutoComplete(autoComplete);
+            applySettings();
+        }
+
+        function applySettings() {
+            // CSS 변수 설정
+            document.documentElement.style.setProperty('--primary-color', currentTheme);
+            document.documentElement.style.setProperty('--text-shadow', textShadowEnabled ? '1px 1px 2px rgba(0,0,0,0.5)' : 'none');
+            document.documentElement.style.setProperty('--slot-height', slotHeight + 'px');
+            document.documentElement.style.setProperty('--font-size', fontSize + 'px');
             
             // 입력 필드 값 설정
-            document.getElementById('interface-color').value = currentTheme;
-            document.getElementById('opacity-slider').value = taskOpacity;
-            document.getElementById('height-slider').value = slotHeight;
-            document.getElementById('font-slider').value = fontSize;
+            if (document.getElementById('interface-color')) {
+                document.getElementById('interface-color').value = currentTheme;
+                document.getElementById('color-preview').style.backgroundColor = currentTheme;
+                document.getElementById('opacity-slider').value = taskOpacity;
+                document.getElementById('opacity-value').textContent = Math.round(taskOpacity * 100) + '%';
+                document.getElementById('height-slider').value = slotHeight;
+                document.getElementById('height-value').textContent = slotHeight + 'px';
+                document.getElementById('font-slider').value = fontSize;
+                document.getElementById('font-value').textContent = fontSize + 'px';
+                
+                // 토글 버튼 상태 설정
+                toggleTextShadow(textShadowEnabled);
+            }
         }
 
         // 초기화
@@ -1065,12 +1027,7 @@
         // 폼 초기화
         function resetForm() {
             document.getElementById('task-name').value = '';
-            const themeColors = {
-                'white': '#ffffff',
-                'gray': '#6c757d', 
-                'dark': '#343a40'
-            };
-            document.getElementById('task-color').value = themeColors[currentTheme];
+            document.getElementById('task-color').value = currentTheme;
             document.getElementById('start-hour').value = 6;
             document.getElementById('start-minute').value = 0;
             document.getElementById('end-hour').value = 7;
