@@ -1307,9 +1307,6 @@
             const grid = document.getElementById('week-grid');
             grid.innerHTML = '';
 
-            const weekStart = new Date(currentWeek);
-            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-
             // 헤더 생성
             const timeHeader = document.createElement('div');
             timeHeader.className = 'week-header';
@@ -1318,15 +1315,13 @@
 
             const days = ['일', '월', '화', '수', '목', '금', '토'];
             days.forEach((day, index) => {
-                const date = new Date(weekStart);
-                date.setDate(date.getDate() + index);
                 const dayHeader = document.createElement('div');
                 dayHeader.className = 'week-header';
-                dayHeader.textContent = `${day} ${date.getDate()}`;
+                dayHeader.textContent = `${day}`;
                 grid.appendChild(dayHeader);
             });
 
-            // 시간별 행 생성
+            // 시간별 행 생성 (일정이 없어도 항상 생성)
             for (let hour = 6; hour < 30; hour++) {
                 const displayHour = hour >= 24 ? hour - 24 : hour;
                 
@@ -1336,8 +1331,8 @@
                 grid.appendChild(timeLabel);
 
                 for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
-                    const date = new Date(weekStart);
-                    date.setDate(date.getDate() + dayIndex);
+                    const date = new Date(currentWeek);
+                    date.setDate(date.getDate() - date.getDay() + dayIndex);
                     const dateKey = getDateKey(date);
                     const dayTasks = tasks[dateKey] || [];
 
@@ -1378,7 +1373,6 @@
             const year = currentMonth.getFullYear();
             const month = currentMonth.getMonth();
             const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
             const startDate = new Date(firstDay);
             startDate.setDate(startDate.getDate() - firstDay.getDay());
 
@@ -1408,7 +1402,7 @@
                 container.appendChild(dayHeader);
             });
 
-            // 날짜 셀 생성
+            // 날짜 셀 생성 (일정이 없어도 항상 생성)
             for (let week = 0; week < 6; week++) {
                 for (let day = 0; day < 7; day++) {
                     const date = new Date(startDate);
