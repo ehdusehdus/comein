@@ -11,29 +11,9 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --primary-color: #6c757d;
-            --background-color: #fff;
-            --container-bg: #fff;
-            --text-color: #222;
-            --input-bg: #fff;
-            --border-color: #dee2e6;
-            --time-slot-color: white;
-        }
-
-        [data-theme="dark"] {
-            --primary-color: #bfc8d6;
-            --background-color: #181a1b;
-            --container-bg: #23272b;
-            --text-color: #f1f3f5;
-            --input-bg: #23272b;
-            --border-color: #444b53;
-        }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--background-color);
-            color: var(--text-color);
+            background: white;
             min-height: 100vh;
             padding: 20px;
         }
@@ -41,7 +21,7 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: var(--container-bg);
+            background: white;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             overflow: hidden;
@@ -111,14 +91,12 @@
         .form-group input, .form-group select {
             width: 100%;
             padding: 6px 4px;
-            border: 2px solid var(--border-color);
+            border: 2px solid #dee2e6;
             border-radius: 8px;
             font-size: 13px;
             transition: border-color 0.3s ease;
             min-width: 0;
             box-sizing: border-box;
-            background: var(--input-bg);
-            color: var(--text-color);
         }
 
         /* 시간 선택 select는 form-group 폭에 맞춰 유동적으로 */
@@ -496,6 +474,11 @@
             display: none;
         }
 
+        :root {
+            --primary-color: #6c757d;
+            --time-slot-color: white;
+        }
+
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: row;
@@ -633,10 +616,6 @@
             <div id="settings-view" class="view-content hidden">
                 <div class="settings-section">
                     <h3>🎨 외관 설정</h3>
-                    <div class="setting-group">
-                        <label>테마</label>
-                        <button class="btn btn-secondary" id="theme-toggle-btn" onclick="toggleTheme()">🌙 다크모드</button>
-                    </div>
                     <div class="setting-group">
                         <label>인터페이스 색상</label>
                         <div class="color-picker-group">
@@ -1629,28 +1608,15 @@
         }
     </script>
     <script>
-        function toggleTheme() {
-            const html = document.documentElement;
-            const isDark = html.getAttribute('data-theme') === 'dark';
-            if (isDark) {
-                html.setAttribute('data-theme', 'light');
-                localStorage.setItem('timeTracker_themeMode', 'light');
-                document.getElementById('theme-toggle-btn').textContent = '🌙 다크모드';
-            } else {
-                html.setAttribute('data-theme', 'dark');
-                localStorage.setItem('timeTracker_themeMode', 'dark');
-                document.getElementById('theme-toggle-btn').textContent = '☀️ 라이트모드';
-            }
+        // 주간 이동 함수 추가
+        function changeWeek(weeks) {
+            currentWeek.setDate(currentWeek.getDate() + weeks * 7);
+            updateWeekDisplay();
+            renderWeekView();
         }
-        window.addEventListener('DOMContentLoaded', () => {
-            const saved = localStorage.getItem('timeTracker_themeMode');
-            if (saved === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                const btn = document.getElementById('theme-toggle-btn');
-                if (btn) btn.textContent = '☀️ 라이트모드';
-            }
-            // 항상 일간 뷰가 기본으로 보이게
-            showTab('daily');
+        // 무조건 DOMContentLoaded에서만 init 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            init();
         });
     </script>
 </body>
