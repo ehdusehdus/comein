@@ -1212,6 +1212,14 @@
             return `${displayHour.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}${suffix}`;
         }
 
+        // (월간 뷰 전용) 시간 문자열: 항상 HH:MM 형식, 괄호/다음날 표기 없음
+        function timeToStringShort(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            const displayHour = hours >= 24 ? hours - 24 : hours;
+            return `${displayHour.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+        }
+
         // 일정 렌더링
         function renderSchedule() {
             const grid = document.getElementById('schedule-grid');
@@ -1433,7 +1441,7 @@
                     dateSpan.textContent = date.getDate();
                     dayCell.appendChild(dateSpan);
 
-                    // 할일 표시
+                    // 할일 표시 (flex로 제목/시간 분리)
                     dayTasks.slice(0, 3).forEach(task => {
                         const taskDiv = document.createElement('div');
                         taskDiv.style.cssText = `
@@ -1446,9 +1454,21 @@
                             white-space: nowrap;
                             overflow: hidden;
                             text-overflow: ellipsis;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            gap: 4px;
                         `;
-                        taskDiv.textContent = `${task.name} (${timeToString(task.startTime)} - ${timeToString(task.endTime)})`;
-                        taskDiv.title = `${task.name} (${timeToString(task.startTime)} - ${timeToString(task.endTime)})`;
+                        // 제목 왼쪽, 시간 오른쪽
+                        const titleSpan = document.createElement('span');
+                        titleSpan.style.textAlign = 'left';
+                        titleSpan.textContent = task.name;
+                        const timeSpan = document.createElement('span');
+                        timeSpan.style.textAlign = 'right';
+                        timeSpan.textContent = `${timeToStringShort(task.startTime)}-${timeToStringShort(task.endTime)}`;
+                        taskDiv.appendChild(titleSpan);
+                        taskDiv.appendChild(timeSpan);
+                        taskDiv.title = `${task.name} ${timeToStringShort(task.startTime)}-${timeToStringShort(task.endTime)}`;
                         dayCell.appendChild(taskDiv);
                     });
 
