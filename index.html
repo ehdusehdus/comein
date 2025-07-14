@@ -112,31 +112,31 @@
         }
 
         .btn-primary {
-            background: #6c757d;
+            background: var(--primary-color);
             color: white;
         }
 
         .btn-primary:hover {
-            background: #5a6268;
+            background: var(--primary-color);
             transform: translateY(-2px);
         }
 
         .btn-secondary {
-            background: #6c757d;
+            background: var(--primary-color);
             color: white;
         }
 
         .btn-secondary:hover {
-            background: #5a6268;
+            background: var(--primary-color);
         }
 
         .btn-danger {
-            background: #5a6268;
+            background: var(--primary-color);
             color: white;
         }
 
         .btn-danger:hover {
-            background: #5a6268;
+            background: var(--primary-color);
         }
 
         .date-navigator {
@@ -150,7 +150,7 @@
         .date-nav-btn {
             padding: 10px 15px;
             border: none;
-            background: #6c757d;
+            background: var(--primary-color);
             color: white;
             border-radius: 8px;
             cursor: pointer;
@@ -158,7 +158,7 @@
         }
 
         .date-nav-btn:hover {
-            background: #5a6268;
+            background: var(--primary-color);
         }
 
         .current-date {
@@ -226,7 +226,7 @@
         }
 
         .week-header {
-            background: #6c757d;
+            background: var(--primary-color);
             color: white;
             padding: 10px;
             text-align: center;
@@ -243,7 +243,7 @@
         }
 
         .task-item {
-            background: #6c757d;
+            background: var(--primary-color);
             color: white;
             padding: 2px 4px;
             margin: 1px 0;
@@ -287,7 +287,7 @@
             border: none;
             font-size: 16px;
             cursor: pointer;
-            color: #6c757d;
+            color: var(--primary-color);
             padding: 5px;
             border-radius: 4px;
             transition: all 0.3s ease;
@@ -340,7 +340,7 @@
 
         .task-time {
             font-size: 12px;
-            color: #6c757d;
+            color: var(--primary-color);
         }
 
         .task-actions {
@@ -1361,7 +1361,7 @@
             days.forEach(day => {
                 const dayHeader = document.createElement('div');
                 dayHeader.style.cssText = `
-                    background: #5a6268;
+                    background: var(--primary-color);
                     color: white;
                     padding: 15px 10px;
                     text-align: center;
@@ -1501,7 +1501,7 @@
                     barContainer.innerHTML = `
                         <div class="chart-label">${taskName}</div>
                         <div class="chart-progress">
-                            <div class="chart-fill" style="width: ${percentage}%; background-color: ${taskColors[taskName] || '#667eea'}"></div>
+                            <div class="chart-fill" style="width: ${percentage}%; background-color: var(--primary-color)"></div>
                         </div>
                         <div class="chart-value">${frequency}회</div>
                     `;
