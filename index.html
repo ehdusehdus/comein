@@ -523,39 +523,41 @@
         <div class="content">
             <!-- 일간 뷰 -->
             <div id="daily-view" class="view-content">
-                <div class="form-section-toggle" style="margin-bottom: 10px;">
-                    <button class="btn btn-secondary" id="toggle-form-btn" onclick="toggleFormSection()">할일 추가 폼 접기 ▲</button>
-                </div>
-                <div class="form-section" id="form-section">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="task-name">할일</label>
-                            <input type="text" id="task-name" placeholder="할일을 입력하세요" maxlength="15" list="task-suggestions">
-                            <datalist id="task-suggestions"></datalist>
-                        </div>
-                        <div class="form-group">
-                            <label for="task-color">색상</label>
-                            <input type="color" id="task-color" value="#6c757d">
-                        </div>
-                        <div class="form-group">
-                            <label for="start-hour">시작 시간</label>
-                            <select id="start-hour"></select>
-                        </div>
-                        <div class="form-group">
-                            <label for="start-minute">시작 분</label>
-                            <select id="start-minute"></select>
-                        </div>
-                        <div class="form-group">
-                            <label for="end-hour">끝 시간</label>
-                            <select id="end-hour"></select>
-                        </div>
-                        <div class="form-group">
-                            <label for="end-minute">끝 분</label>
-                            <select id="end-minute"></select>
-                        </div>
-                        <div class="form-btns-right">
-                            <button class="btn btn-primary" onclick="addTask()" title="할일 추가">➕</button>
-                            <button class="btn btn-secondary" onclick="clearTodayTasks()" title="오늘 일정 전체 삭제">🔄</button>
+                <div id="form-toggle-wrap">
+                    <div class="form-section-toggle" style="margin-bottom: 10px;">
+                        <button class="btn btn-secondary" id="toggle-form-btn" onclick="toggleFormSection()">할일 추가 폼 접기 ▲</button>
+                    </div>
+                    <div class="form-section" id="form-section">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="task-name">할일</label>
+                                <input type="text" id="task-name" placeholder="할일을 입력하세요" maxlength="15" list="task-suggestions">
+                                <datalist id="task-suggestions"></datalist>
+                            </div>
+                            <div class="form-group">
+                                <label for="task-color">색상</label>
+                                <input type="color" id="task-color" value="#6c757d">
+                            </div>
+                            <div class="form-group">
+                                <label for="start-hour">시작 시간</label>
+                                <select id="start-hour"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="start-minute">시작 분</label>
+                                <select id="start-minute"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="end-hour">끝 시간</label>
+                                <select id="end-hour"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="end-minute">끝 분</label>
+                                <select id="end-minute"></select>
+                            </div>
+                            <div class="form-btns-right">
+                                <button class="btn btn-primary" onclick="addTask()" title="할일 추가">➕</button>
+                                <button class="btn btn-secondary" onclick="clearTodayTasks()" title="오늘 일정 전체 삭제">🔄</button>
+                            </div>
                         </div>
                     </div>
                 </div>
