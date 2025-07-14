@@ -261,9 +261,52 @@
             margin-bottom: 20px;
         }
 
-        .task-list h3 {
+        .task-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 5px 0;
+            border-bottom: 1px solid #dee2e6;
             margin-bottom: 15px;
+        }
+
+        .task-list-header:hover {
+            background: rgba(0,0,0,0.05);
+            border-radius: 8px;
+            padding: 5px 10px;
+        }
+
+        .task-list-header h3 {
+            margin: 0;
             color: #495057;
+        }
+
+        .toggle-list-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: #6c757d;
+            padding: 5px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-list-btn:hover {
+            background: rgba(0,0,0,0.1);
+            transform: scale(1.1);
+        }
+
+        .task-list-content {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .task-list-content.collapsed {
+            max-height: 0;
+            padding: 0;
+            margin: 0;
         }
 
         .task-list-item {
@@ -440,8 +483,8 @@
                         </div>
                     </div>
                     <button class="btn btn-primary" onclick="addTask()" title="할일 추가">➕</button>
-                    <button class="btn btn-secondary" onclick="resetForm()" title="폼 초기화">🔄</button>
                     <button class="btn btn-danger" onclick="clearAllTasks()" title="전체 삭제">🗑️</button>
+                    <button class="btn btn-secondary" onclick="resetForm()" title="폼 초기화">🔄</button>
                 </div>
 
                 <div class="date-navigator">
@@ -451,8 +494,11 @@
                 </div>
 
                 <div class="task-list">
-                    <h3>오늘의 할일 목록</h3>
-                    <div id="task-list-container"></div>
+                    <div class="task-list-header" onclick="toggleTaskList()">
+                        <h3>오늘의 할일 목록</h3>
+                        <button class="toggle-list-btn" id="toggle-btn">▼</button>
+                    </div>
+                    <div id="task-list-container" class="task-list-content"></div>
                 </div>
 
                 <div class="schedule-grid" id="schedule-grid"></div>
@@ -588,6 +634,7 @@
         let taskOpacity = 1;
         let slotHeight = 40;
         let fontSize = 12;
+        let taskListExpanded = true;
 
         const colors = [
             '#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe',
@@ -595,13 +642,36 @@
             '#ffb7b2', '#ffeaa7', '#d1f2eb', '#fad7a0', '#e8daef', '#aed6f1'
         ];
 
+        // 할일 목록 토글 함수
+        function toggleTaskList() {
+            taskListExpanded = !taskListExpanded;
+            const content = document.getElementById('task-list-container');
+            const toggleBtn = document.getElementById('toggle-btn');
+            
+            if (taskListExpanded) {
+                content.classList.remove('collapsed');
+                toggleBtn.textContent = '▼';
+            } else {
+                content.classList.add('collapsed');
+                toggleBtn.textContent = '▶';
+            }
+            
+            // 상태 저장
+            localStorage.setItem('taskListExpanded', taskListExpanded);
+        }
+
         // 설정 관련 함수들
         function changeCustomTheme(color) {
             currentTheme = color;
+            
+            // CSS 변수 즉시 업데이트
             document.documentElement.style.setProperty('--primary-color', color);
             
             // 색상 미리보기 업데이트
-            document.getElementById('color-preview').style.backgroundColor = color;
+            const preview = document.getElementById('color-preview');
+            if (preview) {
+                preview.style.backgroundColor = color;
+            }
             
             // 모든 인터페이스 요소 업데이트
             updateInterfaceColors();
@@ -609,14 +679,47 @@
         }
 
         function updateInterfaceColors() {
-            // 모든 버튼과 인터페이스 요소 색상 업데이트
+            // 네비게이션 탭 활성 상태 업데이트
+            const activeTab = document.querySelector('.nav-tab.active');
+            if (activeTab) {
+                activeTab.style.borderBottomColor = currentTheme;
+            }
+            
+            // 버튼들 색상 업데이트
+            const primaryBtns = document.querySelectorAll('.btn-primary, .date-nav-btn');
+            primaryBtns.forEach(btn => {
+                btn.style.backgroundColor = currentTheme;
+            });
+            
+            // 주간 뷰 헤더 업데이트
+            const weekHeaders = document.querySelectorAll('.week-header');
+            weekHeaders.forEach(header => {
+                header.style.backgroundColor = currentTheme;
+            });
+            
+            // 시간표와 할일 목록 다시 렌더링
             renderSchedule();
             renderTaskList();
         }
 
         function resetToDefaultColors() {
-            changeCustomTheme('#ffffff');
-            document.getElementById('interface-color').value = '#ffffff';
+            // 기본 흰색으로 리셋
+            const defaultColor = '#ffffff';
+            currentTheme = defaultColor;
+            
+            // UI 즉시 업데이트
+            document.getElementById('interface-color').value = defaultColor;
+            document.getElementById('color-preview').style.backgroundColor = defaultColor;
+            document.documentElement.style.setProperty('--primary-color', defaultColor);
+            
+            // 모든 인터페이스 색상 업데이트
+            updateInterfaceColors();
+            saveSettings();
+            
+            // 페이지 새로고침으로 완전히 적용
+            setTimeout(() => {
+                location.reload();
+            }, 100);
         }
 
         function toggleTextShadow(enabled) {
@@ -761,6 +864,24 @@
             document.documentElement.style.setProperty('--text-shadow', textShadowEnabled ? '1px 1px 2px rgba(0,0,0,0.5)' : 'none');
             document.documentElement.style.setProperty('--slot-height', slotHeight + 'px');
             document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+            
+            // 할일 목록 토글 상태 복원
+            const savedExpanded = localStorage.getItem('taskListExpanded');
+            if (savedExpanded !== null) {
+                taskListExpanded = savedExpanded === 'true';
+                const content = document.getElementById('task-list-container');
+                const toggleBtn = document.getElementById('toggle-btn');
+                
+                if (content && toggleBtn) {
+                    if (taskListExpanded) {
+                        content.classList.remove('collapsed');
+                        toggleBtn.textContent = '▼';
+                    } else {
+                        content.classList.add('collapsed');
+                        toggleBtn.textContent = '▶';
+                    }
+                }
+            }
             
             // 입력 필드 값 설정
             if (document.getElementById('interface-color')) {
@@ -1033,6 +1154,9 @@
             document.getElementById('end-hour').value = 7;
             document.getElementById('end-minute').value = 0;
             editingTask = null;
+            
+            // 할일 이름 입력란에 포커스
+            document.getElementById('task-name').focus();
         }
 
         // 전체 삭제
@@ -1119,7 +1243,7 @@
             const dayTasks = tasks[dateKey] || [];
 
             if (dayTasks.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #6c757d;">오늘 등록된 할일이 없습니다.</p>';
+                container.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 20px;">오늘 등록된 할일이 없습니다.</p>';
                 return;
             }
 
@@ -1133,8 +1257,8 @@
                         <span class="task-time">${timeToString(task.startTime)} - ${timeToString(task.endTime)}</span>
                     </div>
                     <div class="task-actions">
-                        <button class="btn-small btn-primary" onclick="editTask('${dateKey}', ${task.id})" title="수정">✏️</button>
-                        <button class="btn-small btn-danger" onclick="deleteTask('${dateKey}', ${task.id})" title="삭제">🗑️</button>
+                        <button class="btn-small btn-primary" onclick="editTask('${dateKey}', '${task.id}')" title="수정">✏️</button>
+                        <button class="btn-small btn-danger" onclick="deleteTask('${dateKey}', '${task.id}')" title="삭제">🗑️</button>
                     </div>
                 `;
                 container.appendChild(item);
@@ -1191,19 +1315,17 @@
                     });
 
                     if (currentTask) {
-                        const taskItem = document.createElement('div');
-                        taskItem.className = 'task-item';
-                        taskItem.style.backgroundColor = currentTask.color;
-                        taskItem.style.opacity = taskOpacity;
+                        dayCell.classList.add('has-task');
+                        dayCell.style.backgroundColor = currentTask.color;
+                        dayCell.style.opacity = taskOpacity;
                         
                         // 시작 시간에만 텍스트 표시
                         const taskStartHour = Math.floor(currentTask.startTime / 60);
                         if (hour === taskStartHour) {
-                            taskItem.textContent = currentTask.name;
+                            dayCell.textContent = currentTask.name;
                         }
                         
-                        taskItem.title = `${currentTask.name} (${timeToString(currentTask.startTime)} - ${timeToString(currentTask.endTime)})`;
-                        dayCell.appendChild(taskItem);
+                        dayCell.title = `${currentTask.name} (${timeToString(currentTask.startTime)} - ${timeToString(currentTask.endTime)})`;
                     }
 
                     grid.appendChild(dayCell);
