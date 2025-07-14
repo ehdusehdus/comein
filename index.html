@@ -245,6 +245,14 @@
             padding: 5px;
             font-size: 11px;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .week-day-task-title {
+            width: 100%;
+            text-align: center;
+            display: block;
         }
 
         .task-item {
@@ -1332,7 +1340,7 @@
                         // 시작 시간에만 텍스트 표시
                         const taskStartHour = Math.floor(currentTask.startTime / 60);
                         if (hour === taskStartHour) {
-                            dayCell.textContent = currentTask.name;
+                            dayCell.innerHTML = `<span class="week-day-task-title">${currentTask.name}</span>`;
                         }
                         
                         dayCell.title = `${currentTask.name} (${timeToString(currentTask.startTime)} - ${timeToString(currentTask.endTime)})`;
@@ -1415,7 +1423,7 @@
                         const taskDiv = document.createElement('div');
                         taskDiv.style.cssText = `
                             background: ${task.color};
-                            color: white;
+                            color: black;
                             padding: 2px 4px;
                             margin: 2px 0;
                             border-radius: 3px;
@@ -1424,7 +1432,7 @@
                             overflow: hidden;
                             text-overflow: ellipsis;
                         `;
-                        taskDiv.textContent = task.name;
+                        taskDiv.textContent = `${task.name} (${timeToString(task.startTime)} - ${timeToString(task.endTime)})`;
                         taskDiv.title = `${task.name} (${timeToString(task.startTime)} - ${timeToString(task.endTime)})`;
                         dayCell.appendChild(taskDiv);
                     });
