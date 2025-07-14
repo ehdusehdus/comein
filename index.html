@@ -1564,21 +1564,25 @@
             });
 
             // 선택된 탭 활성화
-            // event.target이 undefined일 수 있으니, 탭 이름으로 직접 처리
             const tabButtons = document.querySelectorAll('.nav-tab');
             tabButtons.forEach(tab => {
                 if (tab.textContent.includes(tabName === 'daily' ? '일간' :
-                                      tabName === 'weekly' ? '주간' :
-                                      tabName === 'monthly' ? '월간' :
-                                      tabName === 'stats' ? '통계' :
-                                      tabName === 'settings' ? '설정' : '')) {
+                                  tabName === 'weekly' ? '주간' :
+                                  tabName === 'monthly' ? '월간' :
+                                  tabName === 'stats' ? '통계' :
+                                  tabName === 'settings' ? '설정' : '')) {
                     tab.classList.add('active');
                 }
             });
             document.getElementById(tabName + '-view').classList.remove('hidden');
 
-            // 각 뷰에 맞는 렌더링
+            // 각 뷰에 맞는 렌더링 및 날짜 표시
             switch(tabName) {
+                case 'daily':
+                    updateCurrentDate();
+                    renderSchedule();
+                    renderTaskList();
+                    break;
                 case 'weekly':
                     updateWeekDisplay();
                     renderWeekView();
