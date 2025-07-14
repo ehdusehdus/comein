@@ -952,8 +952,10 @@
             setupTaskNameListener();
             updateTaskFrequency();
             updateTaskSuggestions();
-            // showTab('daily')만 호출하면 나머지는 showTab에서 처리됨
-            showTab('daily');
+            updateCurrentDate(); // 무조건 호출
+            renderSchedule();    // 무조건 호출
+            renderTaskList();
+            updateStats();
         }
 
         // 로컬 스토리지에서 데이터 로드
@@ -1580,7 +1582,6 @@
             document.getElementById(tabName + '-view').classList.remove('hidden');
             switch(tabName) {
                 case 'daily':
-                    setupTimeSelects(); // 일간 뷰 진입 시마다 select 옵션 재생성
                     updateCurrentDate();
                     renderSchedule();
                     renderTaskList();
