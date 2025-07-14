@@ -889,9 +889,9 @@
                     if (settings.fontSize !== undefined) fontSize = settings.fontSize;
                 } catch (error) {
                     console.log('설정 로드 오류:', error);
+                    localStorage.removeItem('timeTracker_settings');
                 }
             }
-            
             // theme 별도 복원
             const savedTheme = localStorage.getItem('timeTracker_theme');
             if (savedTheme) currentTheme = savedTheme;
@@ -963,10 +963,20 @@
             const savedColors = localStorage.getItem('timeTracker_colors');
             
             if (savedTasks) {
-                tasks = JSON.parse(savedTasks);
+                try {
+                    tasks = JSON.parse(savedTasks);
+                } catch (e) {
+                    tasks = {};
+                    localStorage.removeItem('timeTracker_tasks');
+                }
             }
             if (savedColors) {
-                taskColors = JSON.parse(savedColors);
+                try {
+                    taskColors = JSON.parse(savedColors);
+                } catch (e) {
+                    taskColors = {};
+                    localStorage.removeItem('timeTracker_colors');
+                }
             }
         }
 
@@ -1568,25 +1578,34 @@
                 return;
             }
 
+            // 각 카테고리별 총 시간 계산
+            const categoryMinutes = {};
+            Object.keys(tasks).forEach(dateKey => {
+                tasks[dateKey].forEach(task => {
+                    categoryMinutes[task.name] = (categoryMinutes[task.name] || 0) + (task.endTime - task.startTime);
+                });
+            });
+
             const maxFrequency = Math.max(...Object.values(taskFrequency));
-            
             Object.entries(taskFrequency)
                 .sort(([,a], [,b]) => b - a)
                 .slice(0, 10)
                 .forEach(([taskName, frequency]) => {
                     const barContainer = document.createElement('div');
                     barContainer.className = 'chart-bar';
-                    
                     const percentage = (frequency / maxFrequency) * 100;
-                    
+                    // 총 시간 표시 (시:분)
+                    const totalMin = categoryMinutes[taskName] || 0;
+                    const hour = Math.floor(totalMin / 60);
+                    const min = totalMin % 60;
+                    const timeStr = hour > 0 ? `${hour}h ${min}m` : `${min}m`;
                     barContainer.innerHTML = `
                         <div class="chart-label">${taskName}</div>
                         <div class="chart-progress">
                             <div class="chart-fill" style="width: ${percentage}%; background-color: var(--primary-color)"></div>
                         </div>
-                        <div class="chart-value">${frequency}회</div>
+                        <div class="chart-value">${frequency}회<br><span style='color:#495057;font-size:11px;'>${timeStr}</span></div>
                     `;
-                    
                     chartContainer.appendChild(barContainer);
                 });
         }
