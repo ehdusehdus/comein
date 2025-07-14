@@ -48,7 +48,7 @@
         .nav-tab.active {
             background: white;
             color: #495057;
-            border-bottom: 3px solid #e9ecef;
+            border-bottom: 3px solid #6c757d;
         }
 
         .nav-tab:hover {
@@ -96,10 +96,9 @@
 
         .form-group input:focus, .form-group select:focus {
             outline: none;
-            border-color: #e9ecef;
+            border-color: #6c757d;
         }
 
-        /* 모든 버튼을 연한 회색으로 통일 */
         .btn {
             padding: 12px 20px;
             border: none;
@@ -110,39 +109,34 @@
             transition: all 0.3s ease;
             margin-right: 10px;
             min-width: 45px;
-            background: #e9ecef !important;
-            color: white !important;
-        }
-
-        .btn:hover {
-            opacity: 0.8;
-            transform: translateY(-2px);
         }
 
         .btn-primary {
-            background: #e9ecef !important;
-            color: white !important;
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
         }
 
         .btn-secondary {
-            background: #e9ecef !important;
-            color: white !important;
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
         }
 
         .btn-danger {
-            background: #e9ecef !important;
-            color: white !important;
+            background: #dc3545;
+            color: white;
         }
 
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 14px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            min-width: 35px;
-            background: #e9ecef !important;
-            color: white !important;
+        .btn-danger:hover {
+            background: #c82333;
         }
 
         .date-navigator {
@@ -156,7 +150,7 @@
         .date-nav-btn {
             padding: 10px 15px;
             border: none;
-            background: #e9ecef !important;
+            background: #6c757d;
             color: white;
             border-radius: 8px;
             cursor: pointer;
@@ -164,7 +158,7 @@
         }
 
         .date-nav-btn:hover {
-            opacity: 0.8;
+            background: #5a6268;
         }
 
         .current-date {
@@ -183,7 +177,6 @@
             border-radius: 10px;
             overflow: hidden;
             margin-bottom: 30px;
-            position: relative;
         }
 
         .time-label {
@@ -196,8 +189,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 2;
-            position: relative;
         }
 
         .time-slot {
@@ -210,11 +201,10 @@
             font-size: 12px;
             color: white;
             font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
             position: relative;
             cursor: pointer;
             text-align: center;
-            border: 1px solid #dee2e6;
-            box-sizing: border-box;
         }
 
         .time-slot.empty {
@@ -223,22 +213,6 @@
 
         .time-slot:hover {
             opacity: 0.8;
-        }
-
-        .task-block {
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: white;
-            font-size: 12px;
-            cursor: pointer;
-            z-index: 1;
         }
 
         .week-grid {
@@ -252,7 +226,7 @@
         }
 
         .week-header {
-            background: #e9ecef !important;
+            background: #6c757d;
             color: white;
             padding: 10px;
             text-align: center;
@@ -263,31 +237,21 @@
         .week-day {
             background: white;
             min-height: 40px;
-            padding: 0;
+            padding: 5px;
             font-size: 11px;
             overflow: hidden;
-            position: relative;
         }
 
         .task-item {
-            background: #667eea;
+            background: #6c757d;
             color: white;
-            padding: 0;
-            margin: 0;
-            border-radius: 0;
+            padding: 2px 4px;
+            margin: 1px 0;
+            border-radius: 3px;
             font-size: 10px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            height: 100%;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            top: 0;
-            left: 0;
-            font-weight: 600;
         }
 
         .task-list {
@@ -339,6 +303,15 @@
         .task-actions {
             display: flex;
             gap: 5px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            min-width: 35px;
         }
 
         .stats-grid {
@@ -397,7 +370,7 @@
 
         .chart-fill {
             height: 100%;
-            background: #e9ecef;
+            background: #6c757d;
             transition: width 0.3s ease;
         }
 
@@ -409,247 +382,6 @@
 
         .hidden {
             display: none;
-        }
-
-        /* 설정 관련 스타일 */
-        .settings-section {
-            background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%);
-            padding: 30px;
-            border-radius: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
-        }
-
-        .settings-section h3 {
-            margin-bottom: 25px;
-            color: #2d3748;
-            border-bottom: none;
-            padding-bottom: 0;
-            font-size: 1.3em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .settings-section h3::before {
-            content: '';
-            width: 4px;
-            height: 24px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 2px;
-        }
-
-        .setting-group {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: rgba(255,255,255,0.7);
-            border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.3);
-            transition: all 0.3s ease;
-        }
-
-        .setting-group:hover {
-            background: rgba(255,255,255,0.9);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-
-        .setting-group label {
-            display: block;
-            margin-bottom: 15px;
-            font-weight: 600;
-            color: #2d3748;
-            font-size: 1.1em;
-        }
-
-        .color-picker-group {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            padding: 15px;
-            background: rgba(255,255,255,0.5);
-            border-radius: 12px;
-            border: 2px dashed #e2e8f0;
-        }
-
-        .color-picker-group input[type="color"] {
-            width: 60px;
-            height: 60px;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-        }
-
-        .color-picker-group input[type="color"]:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-
-        .color-preview {
-            width: 120px;
-            height: 60px;
-            border-radius: 12px;
-            border: 3px solid white;
-            background: #e9ecef;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .color-preview::after {
-            content: '미리보기';
-            position: absolute;
-            bottom: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 10px;
-            color: rgba(0,0,0,0.5);
-            font-weight: 600;
-        }
-
-        .reset-btn {
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #f56565, #e53e3e);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
-        }
-
-        .reset-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(245, 101, 101, 0.4);
-        }
-
-        .toggle-options {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .toggle-btn {
-            padding: 12px 24px;
-            border: 2px solid transparent;
-            background: rgba(255,255,255,0.8);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .toggle-btn.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .toggle-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        }
-
-        .slider-group {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            padding: 15px;
-            background: rgba(255,255,255,0.5);
-            border-radius: 12px;
-        }
-
-        .slider-group input[type="range"] {
-            flex: 1;
-            max-width: 250px;
-            height: 8px;
-            border-radius: 4px;
-            background: linear-gradient(to right, #e2e8f0, #667eea);
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        .slider-group input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .slider-group input[type="range"]::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
-        }
-
-        .slider-value {
-            min-width: 70px;
-            font-weight: 700;
-            color: #667eea;
-            font-size: 1.1em;
-            background: rgba(102, 126, 234, 0.1);
-            padding: 8px 12px;
-            border-radius: 8px;
-        }
-
-        .data-buttons {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .data-buttons .btn {
-            background: #e9ecef !important;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .data-buttons .btn:hover {
-            transform: translateY(-3px);
-            opacity: 0.8;
-        }
-
-        .data-info {
-            background: linear-gradient(135deg, #fff, #f7fafc);
-            padding: 20px;
-            border-radius: 15px;
-            border: 2px solid rgba(102, 126, 234, 0.1);
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .data-info p {
-            margin: 8px 0;
-            font-size: 15px;
-            color: #4a5568;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .data-info span {
-            font-weight: 700;
-            color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
-            padding: 4px 8px;
-            border-radius: 6px;
         }
 
         @media (max-width: 768px) {
@@ -688,7 +420,7 @@
                         </div>
                         <div class="form-group">
                             <label for="task-color">색상</label>
-                            <input type="color" id="task-color" value="#e9ecef">
+                            <input type="color" id="task-color" value="#6c757d">
                         </div>
                         <div class="form-group">
                             <label for="start-hour">시작 시간</label>
@@ -779,7 +511,7 @@
                     <div class="setting-group">
                         <label>인터페이스 색상</label>
                         <div class="color-picker-group">
-                            <input type="color" id="interface-color" value="#e9ecef" onchange="changeCustomTheme(this.value)">
+                            <input type="color" id="interface-color" value="#ffffff" onchange="changeCustomTheme(this.value)">
                             <span class="color-preview" id="color-preview"></span>
                             <button class="reset-btn" onclick="resetToDefaultColors()">기본값으로 복구</button>
                         </div>
@@ -851,7 +583,7 @@
         let taskColors = {};
         let editingTask = null;
         let colorIndex = 0;
-        let currentTheme = '#e9ecef';  // 연한 회색 기본값
+        let currentTheme = '#ffffff';
         let textShadowEnabled = false;
         let taskOpacity = 1;
         let slotHeight = 40;
@@ -863,14 +595,863 @@
             '#ffb7b2', '#ffeaa7', '#d1f2eb', '#fad7a0', '#e8daef', '#aed6f1'
         ];
 
+        // 설정 관련 함수들
+        function changeCustomTheme(color) {
+            currentTheme = color;
+            document.documentElement.style.setProperty('--primary-color', color);
+            
+            // 색상 미리보기 업데이트
+            document.getElementById('color-preview').style.backgroundColor = color;
+            
+            // 모든 인터페이스 요소 즉시 업데이트
+            updateInterfaceColors();
+            saveSettings();
+        }
+
+        function updateInterfaceColors() {
+            // 네비게이션 버튼들
+            document.querySelectorAll('.date-nav-btn').forEach(btn => {
+                btn.style.backgroundColor = currentTheme;
+            });
+            
+            // 모든 버튼들 (추가/삭제/리셋)
+            document.querySelectorAll('.btn-primary, .btn-secondary, .btn-danger').forEach(btn => {
+                btn.style.backgroundColor = currentTheme;
+            });
+            
+            // 할일 목록의 수정/삭제 버튼들
+            document.querySelectorAll('.btn-small').forEach(btn => {
+                btn.style.backgroundColor = currentTheme;
+            });
+            
+            // 주간뷰 헤더들
+            document.querySelectorAll('.week-header').forEach(header => {
+                header.style.backgroundColor = currentTheme;
+            });
+            
+            // 월간뷰 요일 헤더들 (동적 생성된 것들)
+            document.querySelectorAll('[style*="background"]').forEach(element => {
+                if (element.textContent && element.textContent.match(/[일월화수목금토]/)) {
+                    element.style.backgroundColor = currentTheme;
+                }
+            });
+            
+            // 탭 활성 표시
+            document.querySelectorAll('.nav-tab.active').forEach(tab => {
+                tab.style.borderBottomColor = currentTheme;
+            });
+            
+            // 차트 막대들
+            document.querySelectorAll('.chart-fill').forEach(fill => {
+                if (!fill.style.backgroundColor || fill.style.backgroundColor.includes('rgb')) {
+                    fill.style.backgroundColor = currentTheme;
+                }
+            });
+            
+            // 데이터 관리 버튼들
+            document.querySelectorAll('.data-buttons .btn').forEach(btn => {
+                btn.style.backgroundColor = currentTheme;
+            });
+        }
+
+        function resetToDefaultColors() {
+            changeCustomTheme('#ffffff');
+            document.getElementById('interface-color').value = '#ffffff';
+        }
+
+        function toggleTextShadow(enabled) {
+            textShadowEnabled = enabled;
+            const shadowValue = enabled ? '1px 1px 2px rgba(0,0,0,0.5)' : 'none';
+            document.documentElement.style.setProperty('--text-shadow', shadowValue);
+            
+            // 버튼 상태 업데이트
+            document.querySelectorAll('.toggle-btn[data-shadow]').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.shadow === (enabled ? 'on' : 'off')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            saveSettings();
+        }
+
+        function changeOpacity(value) {
+            taskOpacity = parseFloat(value);
+            document.getElementById('opacity-value').textContent = Math.round(taskOpacity * 100) + '%';
+            
+            // 모든 할일 블록에 투명도 적용
+            document.querySelectorAll('.time-slot:not(.empty)').forEach(slot => {
+                slot.style.opacity = taskOpacity;
+            });
+            
+            saveSettings();
+        }
+
+        function changeSlotHeight(value) {
+            slotHeight = parseInt(value);
+            document.getElementById('height-value').textContent = slotHeight + 'px';
+            document.documentElement.style.setProperty('--slot-height', slotHeight + 'px');
+            
+            saveSettings();
+        }
+
+        function changeFontSize(value) {
+            fontSize = parseInt(value);
+            document.getElementById('font-value').textContent = fontSize + 'px';
+            document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+            
+            saveSettings();
+        }
+
+        function exportData() {
+            const data = {
+                tasks: tasks,
+                taskColors: taskColors,
+                settings: {
+                    currentTheme,
+                    textShadowEnabled,
+                    taskOpacity,
+                    slotHeight,
+                    fontSize
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'timetracker_backup.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.tasks) tasks = data.tasks;
+                    if (data.taskColors) taskColors = data.taskColors;
+                    if (data.settings) {
+                        const settings = data.settings;
+                        if (settings.currentTheme) currentTheme = settings.currentTheme;
+                        if (settings.textShadowEnabled !== undefined) textShadowEnabled = settings.textShadowEnabled;
+                        if (settings.taskOpacity) taskOpacity = settings.taskOpacity;
+                        if (settings.slotHeight) slotHeight = settings.slotHeight;
+                        if (settings.fontSize) fontSize = settings.fontSize;
+                    }
+                    
+                    saveTasks();
+                    saveSettings();
+                    location.reload(); // 페이지 새로고침으로 모든 설정 적용
+                } catch (error) {
+                    alert('파일을 읽는 중 오류가 발생했습니다.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function updateDataInfo() {
+            const totalRecords = Object.keys(tasks).length;
+            const totalTasks = Object.values(tasks).reduce((sum, dayTasks) => sum + dayTasks.length, 0);
+            const dataSize = Math.round(JSON.stringify({tasks, taskColors}).length / 1024);
+            
+            document.getElementById('total-records').textContent = totalRecords;
+            document.getElementById('total-tasks').textContent = totalTasks;
+            document.getElementById('data-size').textContent = dataSize;
+        }
+
+        function saveSettings() {
+            const settings = {
+                currentTheme,
+                textShadowEnabled,
+                taskOpacity,
+                slotHeight,
+                fontSize
+            };
+            localStorage.setItem('timeTracker_settings', JSON.stringify(settings));
+        }
+
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('timeTracker_settings');
+            if (savedSettings) {
+                try {
+                    const settings = JSON.parse(savedSettings);
+                    if (settings.currentTheme) currentTheme = settings.currentTheme;
+                    if (settings.textShadowEnabled !== undefined) textShadowEnabled = settings.textShadowEnabled;
+                    if (settings.taskOpacity !== undefined) taskOpacity = settings.taskOpacity;
+                    if (settings.slotHeight !== undefined) slotHeight = settings.slotHeight;
+                    if (settings.fontSize !== undefined) fontSize = settings.fontSize;
+                } catch (error) {
+                    console.log('설정 로드 오류:', error);
+                }
+            }
+            
+            // UI에 설정 적용
+            applySettings();
+        }
+
+        function applySettings() {
+            // CSS 변수 설정
+            document.documentElement.style.setProperty('--primary-color', currentTheme);
+            document.documentElement.style.setProperty('--text-shadow', textShadowEnabled ? '1px 1px 2px rgba(0,0,0,0.5)' : 'none');
+            document.documentElement.style.setProperty('--slot-height', slotHeight + 'px');
+            document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+            
+            // 입력 필드 값 설정
+            if (document.getElementById('interface-color')) {
+                document.getElementById('interface-color').value = currentTheme;
+                document.getElementById('color-preview').style.backgroundColor = currentTheme;
+                document.getElementById('opacity-slider').value = taskOpacity;
+                document.getElementById('opacity-value').textContent = Math.round(taskOpacity * 100) + '%';
+                document.getElementById('height-slider').value = slotHeight;
+                document.getElementById('height-value').textContent = slotHeight + 'px';
+                document.getElementById('font-slider').value = fontSize;
+                document.getElementById('font-value').textContent = fontSize + 'px';
+                
+                // 토글 버튼 상태 설정
+                toggleTextShadow(textShadowEnabled);
+                
+                // 인터페이스 색상 즉시 적용
+                updateInterfaceColors();
+            }
+        }
+
         // 초기화
         function init() {
             loadTasks();
-            loadSettings();
             setupTimeSelects();
-            setupTaskNameListener();
             updateCurrentDate();
             renderSchedule();
             renderTaskList();
             updateStats();
         }
+
+        // 로컬 스토리지에서 데이터 로드
+        function loadTasks() {
+            const savedTasks = localStorage.getItem('timeTracker_tasks');
+            const savedColors = localStorage.getItem('timeTracker_colors');
+            
+            if (savedTasks) {
+                tasks = JSON.parse(savedTasks);
+            }
+            if (savedColors) {
+                taskColors = JSON.parse(savedColors);
+            }
+        }
+
+        // 로컬 스토리지에 데이터 저장
+        function saveTasks() {
+            localStorage.setItem('timeTracker_tasks', JSON.stringify(tasks));
+            localStorage.setItem('timeTracker_colors', JSON.stringify(taskColors));
+        }
+
+        // 시간 선택 옵션 설정
+        function setupTimeSelects() {
+            const hourSelects = ['start-hour', 'end-hour'];
+            const minuteSelects = ['start-minute', 'end-minute'];
+
+            // 시간 (06시부터 다음날 06시까지)
+            hourSelects.forEach(id => {
+                const select = document.getElementById(id);
+                select.innerHTML = '';
+                for (let i = 6; i < 24; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = i.toString().padStart(2, '0') + '시';
+                    select.appendChild(option);
+                }
+                for (let i = 0; i < 6; i++) {
+                    const option = document.createElement('option');
+                    option.value = i + 24;
+                    option.textContent = i.toString().padStart(2, '0') + '시';
+                    select.appendChild(option);
+                }
+            });
+
+            // 분 (10분 단위)
+            minuteSelects.forEach(id => {
+                const select = document.getElementById(id);
+                select.innerHTML = '';
+                for (let i = 0; i < 60; i += 10) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = i.toString().padStart(2, '0') + '분';
+                    select.appendChild(option);
+                }
+            });
+        }
+
+        // 할일 이름 입력 필드에 이벤트 리스너 추가
+        function setupTaskNameListener() {
+            const taskNameInput = document.getElementById('task-name');
+            const colorInput = document.getElementById('task-color');
+            
+            taskNameInput.addEventListener('input', function() {
+                const taskName = this.value.trim();
+                if (taskName && taskColors[taskName]) {
+                    // 이미 사용된 할일 이름이면 기존 색상으로 설정
+                    colorInput.value = taskColors[taskName];
+                }
+            });
+        }
+        function updateCurrentDate() {
+            const dateStr = currentDate.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
+            });
+            document.getElementById('current-date').textContent = dateStr;
+        }
+
+        // 날짜 변경
+        function changeDate(days) {
+            currentDate.setDate(currentDate.getDate() + days);
+            updateCurrentDate();
+            renderSchedule();
+            renderTaskList();
+        }
+
+        // 주 변경
+        function changeWeek(weeks) {
+            currentWeek.setDate(currentWeek.getDate() + (weeks * 7));
+            updateWeekDisplay();
+            renderWeekView();
+        }
+
+        // 월 변경
+        function changeMonth(months) {
+            currentMonth.setMonth(currentMonth.getMonth() + months);
+            updateMonthDisplay();
+            renderMonthView();
+        }
+
+        // 주간 표시 업데이트
+        function updateWeekDisplay() {
+            const weekStart = new Date(currentWeek);
+            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekEnd.getDate() + 6);
+            
+            const weekStr = `${weekStart.getFullYear()}년 ${weekStart.getMonth() + 1}월 ${weekStart.getDate()}일 - ${weekEnd.getMonth() + 1}월 ${weekEnd.getDate()}일`;
+            document.getElementById('current-week').textContent = weekStr;
+        }
+
+        // 월간 표시 업데이트
+        function updateMonthDisplay() {
+            const monthStr = currentMonth.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long'
+            });
+            document.getElementById('current-month').textContent = monthStr;
+        }
+
+        // 탭 전환
+        function showTab(tabName) {
+            // 모든 탭 비활성화
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.view-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // 선택된 탭 활성화
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-view').classList.remove('hidden');
+
+            // 각 뷰에 맞는 렌더링
+            switch(tabName) {
+                case 'weekly':
+                    updateWeekDisplay();
+                    renderWeekView();
+                    break;
+                case 'monthly':
+                    updateMonthDisplay();
+                    renderMonthView();
+                    break;
+                case 'stats':
+                    updateStats();
+                    break;
+                case 'settings':
+                    updateDataInfo();
+                    break;
+            }
+        }
+
+        // 할일 추가
+        function addTask() {
+            const name = document.getElementById('task-name').value.trim();
+            const color = document.getElementById('task-color').value;
+            const startHour = parseInt(document.getElementById('start-hour').value);
+            const startMinute = parseInt(document.getElementById('start-minute').value);
+            const endHour = parseInt(document.getElementById('end-hour').value);
+            const endMinute = parseInt(document.getElementById('end-minute').value);
+
+            if (!name) {
+                alert('할일을 입력해주세요.');
+                return;
+            }
+
+            const startTime = startHour * 60 + startMinute;
+            const endTime = endHour * 60 + endMinute;
+
+            if (startTime >= endTime) {
+                alert('시작 시간은 끝 시간보다 빨라야 합니다.');
+                return;
+            }
+
+            const dateKey = getDateKey(currentDate);
+            if (!tasks[dateKey]) {
+                tasks[dateKey] = [];
+            }
+
+            // 사용자가 선택한 색상 사용
+            taskColors[name] = color;
+
+            const newTask = {
+                id: Date.now() + Math.random(),
+                name,
+                startTime,
+                endTime,
+                color: color
+            };
+
+            if (editingTask) {
+                // 편집 모드
+                const taskIndex = tasks[dateKey].findIndex(t => t.id === editingTask.id);
+                if (taskIndex !== -1) {
+                    tasks[dateKey][taskIndex] = newTask;
+                }
+                editingTask = null;
+            } else {
+                // 새 할일 추가
+                tasks[dateKey].push(newTask);
+            }
+
+            saveTasks();
+            resetForm();
+            renderSchedule();
+            renderTaskList();
+        }
+
+        // 할일 편집
+        function editTask(dateKey, taskId) {
+            const task = tasks[dateKey].find(t => t.id === taskId);
+            if (!task) return;
+
+            editingTask = task;
+            document.getElementById('task-name').value = task.name;
+            document.getElementById('task-color').value = task.color;
+            document.getElementById('start-hour').value = Math.floor(task.startTime / 60);
+            document.getElementById('start-minute').value = task.startTime % 60;
+            document.getElementById('end-hour').value = Math.floor(task.endTime / 60);
+            document.getElementById('end-minute').value = task.endTime % 60;
+        }
+
+        // 할일 삭제
+        function deleteTask(dateKey, taskId) {
+            if (confirm('정말로 삭제하시겠습니까?')) {
+                tasks[dateKey] = tasks[dateKey].filter(t => t.id !== taskId);
+                if (tasks[dateKey].length === 0) {
+                    delete tasks[dateKey];
+                }
+                saveTasks();
+                renderSchedule();
+                renderTaskList();
+            }
+        }
+
+        // 폼 초기화
+        function resetForm() {
+            document.getElementById('task-name').value = '';
+            document.getElementById('task-color').value = currentTheme;
+            document.getElementById('start-hour').value = 6;
+            document.getElementById('start-minute').value = 0;
+            document.getElementById('end-hour').value = 7;
+            document.getElementById('end-minute').value = 0;
+            editingTask = null;
+        }
+
+        // 전체 삭제
+        function clearAllTasks() {
+            if (confirm('모든 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                tasks = {};
+                taskColors = {};
+                localStorage.removeItem('timeTracker_tasks');
+                localStorage.removeItem('timeTracker_colors');
+                renderSchedule();
+                renderTaskList();
+                updateStats();
+            }
+        }
+
+        // 날짜 키 생성
+        function getDateKey(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        // 시간을 문자열로 변환
+        function timeToString(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            const displayHour = hours >= 24 ? hours - 24 : hours;
+            const suffix = hours >= 24 ? ' (다음날)' : '';
+            return `${displayHour.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}${suffix}`;
+        }
+
+        // 일정 렌더링
+        function renderSchedule() {
+            const grid = document.getElementById('schedule-grid');
+            grid.innerHTML = '';
+
+            const dateKey = getDateKey(currentDate);
+            const dayTasks = tasks[dateKey] || [];
+
+            // 시간별로 행 생성 (06:00 ~ 다음날 06:00)
+            for (let hour = 6; hour < 30; hour++) {
+                const displayHour = hour >= 24 ? hour - 24 : hour;
+                
+                // 시간 레이블
+                const timeLabel = document.createElement('div');
+                timeLabel.className = 'time-label';
+                timeLabel.textContent = `${displayHour.toString().padStart(2, '0')}시`;
+                grid.appendChild(timeLabel);
+
+                // 10분 단위 6칸
+                for (let segment = 0; segment < 6; segment++) {
+                    const minute = segment * 10;
+                    const timeMinutes = hour * 60 + minute;
+                    
+                    const slot = document.createElement('div');
+                    slot.className = 'time-slot empty';
+                    
+                    // 해당 시간에 할일 찾기
+                    const task = dayTasks.find(t => 
+                        timeMinutes >= t.startTime && timeMinutes < t.endTime
+                    );
+
+                    if (task) {
+                        slot.className = 'time-slot';
+                        
+                        // 할일 블록 생성
+                        const taskBlock = document.createElement('div');
+                        taskBlock.className = 'task-block';
+                        taskBlock.style.backgroundColor = task.color;
+                        taskBlock.style.opacity = taskOpacity;
+                        
+                        // 시작 시간에만 텍스트 표시
+                        if (timeMinutes === task.startTime) {
+                            taskBlock.textContent = task.name;
+                        }
+                        
+                        taskBlock.onclick = () => editTask(dateKey, task.id);
+                        taskBlock.title = `${task.name} (${timeToString(task.startTime)} - ${timeToString(task.endTime)})`;
+                        
+                        slot.appendChild(taskBlock);
+                    }
+
+                    grid.appendChild(slot);
+                }
+            }
+        }
+
+        // 할일 목록 렌더링
+        function renderTaskList() {
+            const container = document.getElementById('task-list-container');
+            container.innerHTML = '';
+
+            const dateKey = getDateKey(currentDate);
+            const dayTasks = tasks[dateKey] || [];
+
+            if (dayTasks.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #6c757d;">오늘 등록된 할일이 없습니다.</p>';
+                return;
+            }
+
+            dayTasks.sort((a, b) => a.startTime - b.startTime).forEach(task => {
+                const item = document.createElement('div');
+                item.className = 'task-list-item';
+                item.innerHTML = `
+                    <div class="task-info">
+                        <div class="task-color" style="background-color: ${task.color}"></div>
+                        <span class="task-name">${task.name}</span>
+                        <span class="task-time">${timeToString(task.startTime)} - ${timeToString(task.endTime)}</span>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn-small btn-primary" onclick="editTask('${dateKey}', ${task.id})" title="수정">✏️</button>
+                        <button class="btn-small btn-danger" onclick="deleteTask('${dateKey}', ${task.id})" title="삭제">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // 주간 뷰 렌더링
+        function renderWeekView() {
+            const grid = document.getElementById('week-grid');
+            grid.innerHTML = '';
+
+            const weekStart = new Date(currentWeek);
+            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+
+            // 헤더 생성
+            const timeHeader = document.createElement('div');
+            timeHeader.className = 'week-header';
+            timeHeader.textContent = '시간';
+            grid.appendChild(timeHeader);
+
+            const days = ['일', '월', '화', '수', '목', '금', '토'];
+            days.forEach((day, index) => {
+                const date = new Date(weekStart);
+                date.setDate(date.getDate() + index);
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'week-header';
+                dayHeader.textContent = `${day} ${date.getDate()}`;
+                grid.appendChild(dayHeader);
+            });
+
+            // 시간별 행 생성
+            for (let hour = 6; hour < 30; hour++) {
+                const displayHour = hour >= 24 ? hour - 24 : hour;
+                
+                const timeLabel = document.createElement('div');
+                timeLabel.className = 'time-label';
+                timeLabel.textContent = `${displayHour.toString().padStart(2, '0')}시`;
+                grid.appendChild(timeLabel);
+
+                for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+                    const date = new Date(weekStart);
+                    date.setDate(date.getDate() + dayIndex);
+                    const dateKey = getDateKey(date);
+                    const dayTasks = tasks[dateKey] || [];
+
+                    const dayCell = document.createElement('div');
+                    dayCell.className = 'week-day';
+
+                    // 해당 시간의 할일 찾기
+                    const currentTask = dayTasks.find(task => {
+                        const taskStartHour = Math.floor(task.startTime / 60);
+                        const taskEndHour = Math.floor(task.endTime / 60);
+                        return hour >= taskStartHour && hour < taskEndHour;
+                    });
+
+                    if (currentTask) {
+                        const taskItem = document.createElement('div');
+                        taskItem.className = 'task-item';
+                        taskItem.style.backgroundColor = currentTask.color;
+                        taskItem.style.opacity = taskOpacity;
+                        
+                        // 시작 시간에만 텍스트 표시
+                        const taskStartHour = Math.floor(currentTask.startTime / 60);
+                        if (hour === taskStartHour) {
+                            taskItem.textContent = currentTask.name;
+                        }
+                        
+                        taskItem.title = `${currentTask.name} (${timeToString(currentTask.startTime)} - ${timeToString(currentTask.endTime)})`;
+                        dayCell.appendChild(taskItem);
+                    }
+
+                    grid.appendChild(dayCell);
+                }
+            }
+        }
+
+        // 월간 뷰 렌더링
+        function renderMonthView() {
+            const container = document.getElementById('month-grid');
+            container.innerHTML = '';
+
+            const year = currentMonth.getFullYear();
+            const month = currentMonth.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+            // 월간 그리드 스타일
+            container.style.cssText = `
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                gap: 1px;
+                background: #dee2e6;
+                border-radius: 10px;
+                overflow: hidden;
+                margin-bottom: 30px;
+            `;
+
+            // 요일 헤더
+            const days = ['일', '월', '화', '수', '목', '금', '토'];
+            days.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.style.cssText = `
+                    background: #667eea;
+                    color: white;
+                    padding: 15px 10px;
+                    text-align: center;
+                    font-weight: 600;
+                `;
+                dayHeader.textContent = day;
+                container.appendChild(dayHeader);
+            });
+
+            // 날짜 셀 생성
+            for (let week = 0; week < 6; week++) {
+                for (let day = 0; day < 7; day++) {
+                    const date = new Date(startDate);
+                    date.setDate(date.getDate() + (week * 7) + day);
+                    const dateKey = getDateKey(date);
+                    const dayTasks = tasks[dateKey] || [];
+
+                    const dayCell = document.createElement('div');
+                    dayCell.style.cssText = `
+                        background: white;
+                        min-height: 120px;
+                        padding: 8px;
+                        font-size: 12px;
+                        border: ${date.getMonth() === month ? 'none' : '1px solid #f8f9fa'};
+                        opacity: ${date.getMonth() === month ? '1' : '0.3'};
+                        cursor: pointer;
+                    `;
+
+                    // 날짜 표시
+                    const dateSpan = document.createElement('div');
+                    dateSpan.style.cssText = `
+                        font-weight: bold;
+                        margin-bottom: 5px;
+                        color: ${day === 0 ? '#dc3545' : day === 6 ? '#007bff' : '#495057'};
+                    `;
+                    dateSpan.textContent = date.getDate();
+                    dayCell.appendChild(dateSpan);
+
+                    // 할일 표시
+                    dayTasks.slice(0, 3).forEach(task => {
+                        const taskDiv = document.createElement('div');
+                        taskDiv.style.cssText = `
+                            background: ${task.color};
+                            color: white;
+                            padding: 4px 6px;
+                            margin: 2px 0;
+                            border-radius: 4px;
+                            font-size: 9px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            line-height: 1.2;
+                        `;
+                        
+                        // 시간 정보 포함한 텍스트
+                        const startTime = timeToString(task.startTime);
+                        const endTime = timeToString(task.endTime);
+                        const timeRange = `${startTime.split(' ')[0]}-${endTime.split(' ')[0]}`;
+                        
+                        taskDiv.innerHTML = `
+                            <div style="font-weight: bold; margin-bottom: 1px;">${task.name}</div>
+                            <div style="font-size: 8px; opacity: 0.9;">${timeRange}</div>
+                        `;
+                        
+                        taskDiv.title = `${task.name} (${timeToString(task.startTime)} - ${timeToString(task.endTime)})`;
+                        dayCell.appendChild(taskDiv);
+                    });
+
+                    if (dayTasks.length > 3) {
+                        const moreDiv = document.createElement('div');
+                        moreDiv.style.cssText = `
+                            color: #6c757d;
+                            font-size: 10px;
+                            margin-top: 2px;
+                        `;
+                        moreDiv.textContent = `+${dayTasks.length - 3}개 더`;
+                        dayCell.appendChild(moreDiv);
+                    }
+
+                    // 클릭 이벤트
+                    dayCell.onclick = () => {
+                        currentDate = new Date(date);
+                        showTab('daily');
+                        updateCurrentDate();
+                        renderSchedule();
+                        renderTaskList();
+                    };
+
+                    container.appendChild(dayCell);
+                }
+            }
+        }
+
+        // 통계 업데이트
+        function updateStats() {
+            const allDates = Object.keys(tasks);
+            const totalDays = allDates.length;
+            
+            let totalMinutes = 0;
+            let taskFrequency = {};
+
+            allDates.forEach(dateKey => {
+                tasks[dateKey].forEach(task => {
+                    const duration = task.endTime - task.startTime;
+                    totalMinutes += duration;
+                    
+                    taskFrequency[task.name] = (taskFrequency[task.name] || 0) + 1;
+                });
+            });
+
+            const totalHours = Math.round(totalMinutes / 60 * 10) / 10;
+            const avgDailyHours = totalDays > 0 ? Math.round(totalHours / totalDays * 10) / 10 : 0;
+            
+            const mostFrequentTask = Object.keys(taskFrequency).length > 0 
+                ? Object.keys(taskFrequency).reduce((a, b) => taskFrequency[a] > taskFrequency[b] ? a : b)
+                : '-';
+
+            document.getElementById('total-days').textContent = totalDays;
+            document.getElementById('total-hours').textContent = totalHours + 'h';
+            document.getElementById('avg-daily-hours').textContent = avgDailyHours + 'h';
+            document.getElementById('most-frequent-task').textContent = mostFrequentTask;
+
+            // 카테고리별 차트
+            renderCategoryChart(taskFrequency);
+        }
+
+        // 카테고리별 차트 렌더링
+        function renderCategoryChart(taskFrequency) {
+            const chartContainer = document.getElementById('category-chart');
+            chartContainer.innerHTML = '';
+
+            if (Object.keys(taskFrequency).length === 0) {
+                chartContainer.innerHTML = '<p style="text-align: center; color: #6c757d;">데이터가 없습니다.</p>';
+                return;
+            }
+
+            const maxFrequency = Math.max(...Object.values(taskFrequency));
+            
+            Object.entries(taskFrequency)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 10)
+                .forEach(([taskName, frequency]) => {
+                    const barContainer = document.createElement('div');
+                    barContainer.className = 'chart-bar';
+                    
+                    const percentage = (frequency / maxFrequency) * 100;
+                    
+                    barContainer.innerHTML = `
+                        <div class="chart-label">${taskName}</div>
+                        <div class="chart-progress">
+                            <div class="chart-fill" style="width: ${percentage}%; background-color: ${taskColors[taskName] || '#667eea'}"></div>
+                        </div>
+                        <div class="chart-value">${frequency}회</div>
+                    `;
+                    
+                    chartContainer.appendChild(barContainer);
+                });
+        }
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
