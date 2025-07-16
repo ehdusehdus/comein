@@ -353,6 +353,16 @@
             opacity: 0.8;
         }
 
+        /* 완료된 할일 스타일 */
+        .time-slot.completed {
+            opacity: 0.6;
+            filter: grayscale(0.3);
+        }
+
+        .time-slot.completed span {
+            text-decoration: line-through;
+        }
+
         .week-grid {
             display: grid;
             grid-template-columns: minmax(36px, 80px) repeat(7, 1fr);
@@ -466,6 +476,32 @@
             margin-bottom: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             font-size: 11px;
+            transition: all 0.3s ease;
+        }
+
+        /* 완료된 할일 아이템 스타일 */
+        .task-list-item.completed {
+            opacity: 0.6;
+            background: #f8f9fa;
+        }
+
+        .task-list-item.completed .task-name {
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+
+        .task-list-item.completed .task-time {
+            text-decoration: line-through;
+            color: #adb5bd !important;
+        }
+
+        /* 체크박스 스타일 */
+        .task-checkbox {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
         }
 
         .task-color {
@@ -827,13 +863,13 @@
         let taskColors = {};
         let editingTask = null;
         let colorIndex = 0;
-        let currentTheme = localStorage.getItem('timeTracker_theme') || '#6c757d';
+        let currentTheme = '#6c757d';
         let taskOpacity = 1;
         let slotHeight = 40;
         let fontSize = 12;
         let taskListExpanded = true;
         let formSectionExpanded = true; // 일정 추가 폼 토글 상태
-        let recentColor = localStorage.getItem('timeTracker_recentColor') || '#6c757d';
+        let recentColor = '#6c757d';
         let taskFrequency = {};
 
         const colors = [
@@ -879,6 +915,19 @@
             
             // 상태 저장
             localStorage.setItem('taskListExpanded', taskListExpanded);
+        }
+
+        // 체크박스 토글 함수
+        function toggleTaskCompletion(dateKey, taskId) {
+            if (!tasks[dateKey]) return;
+            
+            const task = tasks[dateKey].find(t => t.id === taskId);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks();
+                renderSchedule();
+                renderTaskList();
+            }
         }
 
         // 설정 관련 함수들
@@ -1256,13 +1305,16 @@
                 name,
                 startTime,
                 endTime,
-                color: color
+                color: color,
+                completed: false // 체크박스 상태 추가
             };
 
             if (editingTask) {
                 // 편집 모드
                 const taskIndex = tasks[dateKey].findIndex(t => t.id === editingTask.id);
                 if (taskIndex !== -1) {
+                    // 기존 완료 상태 유지
+                    newTask.completed = tasks[dateKey][taskIndex].completed;
                     tasks[dateKey][taskIndex] = newTask;
                 }
                 editingTask = null;
@@ -1450,7 +1502,7 @@
                     
                     if (taskCellMap[cellIdx]) {
                         const { task, centerIdx } = taskCellMap[cellIdx][0];
-                        slot.className = 'time-slot';
+                        slot.className = `time-slot ${task.completed ? 'completed' : ''}`;
                         slot.style.backgroundColor = task.color;
                         slot.style.position = 'relative';
                         slot.style.display = 'flex';
@@ -1470,6 +1522,7 @@
                                 pointer-events: none;
                                 font-size: 11px;
                                 text-align: center;
+                                ${task.completed ? 'text-decoration: line-through;' : ''}
                             `;
                             slot.appendChild(textSpan);
                         }
@@ -1504,7 +1557,13 @@
 
             dayTasks.sort((a, b) => a.startTime - b.startTime).forEach(task => {
                 const item = document.createElement('div');
-                item.className = 'task-list-item';
+                item.className = `task-list-item ${task.completed ? 'completed' : ''}`;
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'task-checkbox';
+                checkbox.checked = task.completed || false;
+                checkbox.onchange = () => toggleTaskCompletion(dateKey, task.id);
                 
                 const editBtn = document.createElement('button');
                 editBtn.className = 'btn-small btn-primary';
@@ -1530,6 +1589,10 @@
                     </div>
                     <div class="task-actions"></div>
                 `;
+                
+                // 체크박스를 task-info 앞에 추가
+                const taskInfo = item.querySelector('.task-info');
+                taskInfo.insertBefore(checkbox, taskInfo.firstChild);
                 
                 const actionsDiv = item.querySelector('.task-actions');
                 actionsDiv.appendChild(editBtn);
@@ -1586,12 +1649,15 @@
                     if (currentTask) {
                         dayCell.classList.add('has-task');
                         dayCell.style.backgroundColor = currentTask.color;
-                        dayCell.style.opacity = taskOpacity;
+                        dayCell.style.opacity = currentTask.completed ? 0.4 : taskOpacity;
                         
                         // 시작 시간에만 텍스트 표시
                         const taskStartHour = Math.floor(currentTask.startTime / 60);
                         if (hour === taskStartHour) {
-                            dayCell.innerHTML = `<span class="week-day-task-title">${currentTask.name}</span>`;
+                            const taskText = currentTask.completed ? 
+                                `<span class="week-day-task-title" style="text-decoration: line-through;">${currentTask.name}</span>` :
+                                `<span class="week-day-task-title">${currentTask.name}</span>`;
+                            dayCell.innerHTML = taskText;
                         }
                         
                         dayCell.title = `${currentTask.name} (${timeToString(currentTask.startTime)} - ${timeToString(currentTask.endTime)})`;
@@ -1671,12 +1737,7 @@
                     dayCell.appendChild(dateSpan);
 
                     // 동적으로 최대 표시 개수 계산 (칸 가로폭 기준)
-                    // 임시로 1개만 보이게, 실제로는 칸의 width 측정 후 조절 가능
-                    // 일단 1개만 보이게(모바일/좁은 칸 대응)
                     let maxShow = 1;
-                    // 칸이 충분히 넓으면 2~3개까지 보이게
-                    // (실제 width 측정은 렌더 후 setTimeout 등으로 가능하지만, 여기선 반응형 예시)
-                    // dayCell.offsetWidth는 아직 0이므로, window.innerWidth로 대략 추정
                     if (window.innerWidth > 900) maxShow = 3;
                     else if (window.innerWidth > 600) maxShow = 2;
 
@@ -1696,14 +1757,20 @@
                             align-items: center;
                             justify-content: space-between;
                             gap: 4px;
+                            opacity: ${task.completed ? '0.6' : '1'};
                         `;
+                        
                         // 제목 왼쪽, 시간 오른쪽
                         const titleSpan = document.createElement('span');
                         titleSpan.style.textAlign = 'left';
+                        titleSpan.style.textDecoration = task.completed ? 'line-through' : 'none';
                         titleSpan.textContent = task.name;
+                        
                         const timeSpan = document.createElement('span');
                         timeSpan.style.textAlign = 'right';
+                        timeSpan.style.textDecoration = task.completed ? 'line-through' : 'none';
                         timeSpan.textContent = `${timeToStringShort(task.startTime)}-${timeToStringShort(task.endTime)}`;
+                        
                         taskDiv.appendChild(titleSpan);
                         taskDiv.appendChild(timeSpan);
                         taskDiv.title = `${task.name} ${timeToStringShort(task.startTime)}-${timeToStringShort(task.endTime)}`;
@@ -1742,6 +1809,7 @@
             const totalDays = allDates.length;
             
             let totalMinutes = 0;
+            let completedMinutes = 0;
             let taskFrequency = {};
 
             allDates.forEach(dateKey => {
@@ -1749,11 +1817,16 @@
                     const duration = task.endTime - task.startTime;
                     totalMinutes += duration;
                     
+                    if (task.completed) {
+                        completedMinutes += duration;
+                    }
+                    
                     taskFrequency[task.name] = (taskFrequency[task.name] || 0) + 1;
                 });
             });
 
             const totalHours = Math.round(totalMinutes / 60 * 10) / 10;
+            const completedHours = Math.round(completedMinutes / 60 * 10) / 10;
             const avgDailyHours = totalDays > 0 ? Math.round(totalHours / totalDays * 10) / 10 : 0;
             
             const mostFrequentTask = Object.keys(taskFrequency).length > 0 
