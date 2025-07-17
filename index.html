@@ -1052,6 +1052,7 @@
         let editingSimpleTask = null;
         let draggedElement = null;
         let taskFrequency = {};
+        let lastUsedTime = { startHour: 6, startMinute: 0, endHour: 7, endMinute: 0 };
 
         // 초기화
         function init() {
@@ -1091,6 +1092,12 @@
                 document.documentElement.style.setProperty('--primary-color', currentTheme);
                 document.getElementById('interface-color').value = currentTheme;
                 document.getElementById('color-preview').style.backgroundColor = currentTheme;
+            }
+            
+            // 마지막 사용 시간 로드
+            const savedLastTime = localStorage.getItem('timeTracker_lastUsedTime');
+            if (savedLastTime) {
+                lastUsedTime = JSON.parse(savedLastTime);
             }
             
             // 토글 상태 복원
@@ -1236,6 +1243,21 @@
             renderTaskList();
         }
 
+        // 마지막 사용 시간 저장
+        function saveLastUsedTime() {
+            localStorage.setItem('timeTracker_lastUsedTime', JSON.stringify(lastUsedTime));
+        }
+
+        // 폼에 마지막 사용 시간 적용
+        function applyLastUsedTime() {
+            if (!editingTask) { // 편집 모드가 아닐 때만 적용
+                document.getElementById('start-hour').value = lastUsedTime.startHour;
+                document.getElementById('start-minute').value = lastUsedTime.startMinute;
+                document.getElementById('end-hour').value = lastUsedTime.endHour;
+                document.getElementById('end-minute').value = lastUsedTime.endMinute;
+            }
+        }
+
         // 할일 추가 시 색상 자동 적용 및 빈도수/자동완성 갱신
         function addTask() {
             const name = document.getElementById('task-name').value.trim();
@@ -1263,6 +1285,12 @@
             if (startTime >= endTime) {
                 alert('시작 시간은 끝 시간보다 빨라야 합니다.');
                 return;
+            }
+
+            // 마지막 사용 시간 저장 (편집 모드가 아닐 때만)
+            if (!editingTask) {
+                lastUsedTime = { startHour, startMinute, endHour, endMinute };
+                saveLastUsedTime();
             }
 
             const dateKey = getDateKey(currentDate);
@@ -1390,12 +1418,19 @@
             document.getElementById('task-name').value = '';
             document.getElementById('task-color').value = currentTheme;
             document.getElementById('task-memo').value = '';
-            document.getElementById('start-hour').value = 6;
-            document.getElementById('start-minute').value = 0;
-            document.getElementById('end-hour').value = 7;
-            document.getElementById('end-minute').value = 0;
-            editingTask = null;
             
+            // 편집 모드가 아닐 때만 마지막 사용 시간 적용
+            if (!editingTask) {
+                applyLastUsedTime();
+            } else {
+                // 편집 모드 해제 후 기본값 설정
+                document.getElementById('start-hour').value = 6;
+                document.getElementById('start-minute').value = 0;
+                document.getElementById('end-hour').value = 7;
+                document.getElementById('end-minute').value = 0;
+            }
+            
+            editingTask = null;
             cancelEditSimpleTask();
         }
 
@@ -2483,6 +2518,9 @@
                         toggleBtn.textContent = '◀';
                     }
                 }
+                
+                // 마지막 사용 시간 적용
+                applyLastUsedTime();
             }, 0);
         });
     </script>
