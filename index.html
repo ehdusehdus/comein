@@ -596,6 +596,7 @@
             font-size: 10px;
             overflow: hidden;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
         }
@@ -604,6 +605,17 @@
             width: 100%;
             text-align: center;
             display: block;
+            line-height: 1.1;
+        }
+
+        .week-day-task-memo {
+            width: 100%;
+            text-align: center;
+            display: block;
+            font-size: 8px;
+            opacity: 0.7;
+            line-height: 1;
+            margin-top: 1px;
         }
 
         /* 설정 페이지 스타일 */
@@ -1943,13 +1955,27 @@
                         
                         const taskStartHour = Math.floor(currentTask.startTime / 60);
                         if (hour === taskStartHour) {
-                            const taskText = currentTask.completed ? 
-                                `<span class="week-day-task-title" style="text-decoration: line-through;">${currentTask.name}</span>` :
-                                `<span class="week-day-task-title">${currentTask.name}</span>`;
-                            dayCell.innerHTML = taskText;
+                            const titleSpan = document.createElement('span');
+                            titleSpan.className = 'week-day-task-title';
+                            titleSpan.textContent = currentTask.name;
+                            if (currentTask.completed) {
+                                titleSpan.style.textDecoration = 'line-through';
+                            }
+                            dayCell.appendChild(titleSpan);
+                            
+                            // 메모가 있고 10자 이하일 때만 표시
+                            if (currentTask.memo && currentTask.memo.length <= 10) {
+                                const memoSpan = document.createElement('span');
+                                memoSpan.className = 'week-day-task-memo';
+                                memoSpan.textContent = currentTask.memo;
+                                if (currentTask.completed) {
+                                    memoSpan.style.textDecoration = 'line-through';
+                                }
+                                dayCell.appendChild(memoSpan);
+                            }
                         }
                         
-                        dayCell.title = `${currentTask.name} (${timeToString(currentTask.startTime)} - ${timeToString(currentTask.endTime)})`;
+                        dayCell.title = `${currentTask.name}${currentTask.memo ? ' - ' + currentTask.memo : ''} (${timeToString(currentTask.startTime)} - ${timeToString(currentTask.endTime)})`;
                     }
 
                     grid.appendChild(dayCell);
