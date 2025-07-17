@@ -633,6 +633,39 @@
             gap: 10px;
         }
 
+        .color-input-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .eyedropper-btn {
+            padding: 4px 6px;
+            background: transparent;
+            color: var(--primary-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            min-width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .eyedropper-btn:hover {
+            background: rgba(108, 117, 125, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .eyedropper-btn:disabled {
+            color: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .color-preview {
             display: inline-block;
             width: 20px;
@@ -857,7 +890,10 @@
                             </div>
                             <div class="form-group">
                                 <label for="task-color">색상</label>
-                                <input type="color" id="task-color" value="#6c757d">
+                                <div class="color-input-group">
+                                    <input type="color" id="task-color" value="#6c757d">
+                                    <button type="button" class="eyedropper-btn" onclick="startEyedropper('task-color')" title="스포이드로 색상 선택">🎨</button>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="start-hour">시작 시간</label>
@@ -998,6 +1034,7 @@
                         <label>인터페이스 색상</label>
                         <div class="color-picker-group">
                             <input type="color" id="interface-color" value="#6c757d" onchange="changeCustomTheme(this.value)">
+                            <button type="button" class="eyedropper-btn" onclick="startEyedropper('interface-color')" title="스포이드로 색상 선택">🎨</button>
                             <span class="color-preview" id="color-preview" style="background-color: #6c757d;"></span>
                         </div>
                         <div style="margin-top: 12px;">
@@ -1011,9 +1048,29 @@
                     <div class="setting-group">
                         <label>데이터 백업/복원</label>
                         <div class="data-buttons">
-                            <button class="btn" onclick="exportData()">📤 내보내기</button>
-                            <input type="file" id="import-file" accept=".json" style="display: none" onchange="importData(event)">
-                            <button class="btn" onclick="document.getElementById('import-file').click()">📥 가져오기</button>
+                            <button class="btn" onclick="exportToIcs()">📤 내보내기</button>
+                            <input type="file" id="import-ics-file" accept=".ics" style="display: none" onchange="showImportColorPicker(event)">
+                            <button class="btn" onclick="document.getElementById('import-ics-file').click()">📥 가져오기</button>
+                        </div>
+                        
+                        <!-- 가져오기 색상 선택 팝업 -->
+                        <div id="import-color-popup" style="display: none; margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
+                            <h4 style="margin: 0 0 10px 0; color: #495057;">가져올 일정의 색상을 선택하세요</h4>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                                <label>기본 색상:</label>
+                                <div class="color-input-group">
+                                    <input type="color" id="import-default-color" value="#6c757d">
+                                    <button type="button" class="eyedropper-btn" onclick="startEyedropper('import-default-color')" title="스포이드로 색상 선택">🎨</button>
+                                </div>
+                                <label>
+                                    <input type="checkbox" id="use-existing-colors" checked>
+                                    기존 할일과 같은 이름이면 기존 색상 사용
+                                </label>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn" onclick="confirmImport()">가져오기 실행</button>
+                                <button class="btn" onclick="cancelImport()" style="background: #6c757d;">취소</button>
+                            </div>
                         </div>
                     </div>
 
@@ -1053,6 +1110,8 @@
         let draggedElement = null;
         let taskFrequency = {};
         let lastUsedTime = { startHour: 6, startMinute: 0, endHour: 7, endMinute: 0 };
+        let pendingImportFile = null;
+        let pendingImportEvents = null;
 
         // 초기화
         function init() {
@@ -2308,30 +2367,353 @@
             URL.revokeObjectURL(url);
         }
 
-        function importData(event) {
+        // 구글 캘린더용 .ics 파일로 내보내기
+        function exportToIcs() {
+            let icsContent = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//Time Tracker//Time Tracker//KO',
+                'CALSCALE:GREGORIAN',
+                'METHOD:PUBLISH'
+            ];
+
+            let eventCount = 0;
+            
+            // 모든 시간 지정 일정을 ICS 이벤트로 변환
+            Object.keys(tasks).forEach(dateKey => {
+                const date = new Date(dateKey);
+                tasks[dateKey].forEach(task => {
+                    const startDateTime = new Date(date);
+                    startDateTime.setHours(Math.floor(task.startTime / 60));
+                    startDateTime.setMinutes(task.startTime % 60);
+                    
+                    const endDateTime = new Date(date);
+                    endDateTime.setHours(Math.floor(task.endTime / 60));
+                    endDateTime.setMinutes(task.endTime % 60);
+                    
+                    // 다음날로 넘어가는 경우 처리
+                    if (task.endTime >= 1440) {
+                        endDateTime.setDate(endDateTime.getDate() + 1);
+                        endDateTime.setHours(Math.floor((task.endTime - 1440) / 60));
+                        endDateTime.setMinutes((task.endTime - 1440) % 60);
+                    }
+                    
+                    const now = new Date();
+                    const uid = `${task.id || Date.now()}-${eventCount}@timetracker`;
+                    
+                    icsContent.push('BEGIN:VEVENT');
+                    icsContent.push(`UID:${uid}`);
+                    icsContent.push(`DTSTAMP:${formatIcsDateTime(now)}`);
+                    icsContent.push(`DTSTART:${formatIcsDateTime(startDateTime)}`);
+                    icsContent.push(`DTEND:${formatIcsDateTime(endDateTime)}`);
+                    icsContent.push(`SUMMARY:${escapeIcsText(task.name)}`);
+                    
+                    if (task.memo) {
+                        icsContent.push(`DESCRIPTION:${escapeIcsText(task.memo)}`);
+                    }
+                    
+                    // 완료 상태 표시
+                    if (task.completed) {
+                        icsContent.push('STATUS:COMPLETED');
+                        icsContent.push(`SUMMARY:✅ ${escapeIcsText(task.name)}`);
+                    }
+                    
+                    icsContent.push('END:VEVENT');
+                    eventCount++;
+                });
+            });
+            
+            // 간단한 할일도 종일 이벤트로 추가
+            Object.keys(simpleTasks).forEach(dateKey => {
+                const date = new Date(dateKey);
+                simpleTasks[dateKey].forEach(task => {
+                    const uid = `simple-${task.id || Date.now()}-${eventCount}@timetracker`;
+                    
+                    icsContent.push('BEGIN:VEVENT');
+                    icsContent.push(`UID:${uid}`);
+                    icsContent.push(`DTSTAMP:${formatIcsDateTime(new Date())}`);
+                    icsContent.push(`DTSTART;VALUE=DATE:${formatIcsDate(date)}`);
+                    
+                    const nextDay = new Date(date);
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    icsContent.push(`DTEND;VALUE=DATE:${formatIcsDate(nextDay)}`);
+                    
+                    const prefix = task.completed ? '✅ ' : '📝 ';
+                    icsContent.push(`SUMMARY:${escapeIcsText(prefix + task.text)}`);
+                    
+                    if (task.memo) {
+                        icsContent.push(`DESCRIPTION:${escapeIcsText(task.memo)}`);
+                    }
+                    
+                    if (task.completed) {
+                        icsContent.push('STATUS:COMPLETED');
+                    }
+                    
+                    icsContent.push('END:VEVENT');
+                    eventCount++;
+                });
+            });
+            
+            icsContent.push('END:VCALENDAR');
+            
+            if (eventCount === 0) {
+                alert('내보낼 일정이 없습니다.');
+                return;
+            }
+            
+            // 파일 다운로드
+            const blob = new Blob([icsContent.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `timetracker_calendar_${new Date().toISOString().split('T')[0]}.ics`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert(`${eventCount}개의 일정을 ICS 파일로 내보냈습니다. 캘린더 앱에서 가져오기 하세요.`);
+        }
+
+        // ICS 날짜/시간 포맷
+        function formatIcsDateTime(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hour = String(date.getHours()).padStart(2, '0');
+            const minute = String(date.getMinutes()).padStart(2, '0');
+            const second = String(date.getSeconds()).padStart(2, '0');
+            return `${year}${month}${day}T${hour}${minute}${second}`;
+        }
+
+        // ICS 날짜 포맷 (종일 이벤트용)
+        function formatIcsDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}${month}${day}`;
+        }
+
+        // ICS 텍스트 이스케이프
+        function escapeIcsText(text) {
+            return text
+                .replace(/\\/g, '\\\\')
+                .replace(/;/g, '\\;')
+                .replace(/,/g, '\\,')
+                .replace(/\n/g, '\\n')
+                .replace(/\r/g, '');
+        }
+
+        // 가져오기 색상 선택 팝업 표시
+        function showImportColorPicker(event) {
             const file = event.target.files[0];
             if (!file) return;
             
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    const data = JSON.parse(e.target.result);
+                    const icsContent = e.target.result;
+                    const events = parseIcsFile(icsContent);
                     
-                    if (data.tasks) tasks = data.tasks;
-                    if (data.taskColors) taskColors = data.taskColors;
-                    if (data.simpleTasks) simpleTasks = data.simpleTasks;
-                    if (data.settings && data.settings.currentTheme) {
-                        currentTheme = data.settings.currentTheme;
+                    if (events.length === 0) {
+                        alert('가져올 수 있는 일정이 없습니다.');
+                        return;
                     }
                     
-                    saveTasks();
-                    localStorage.setItem('timeTracker_theme', currentTheme);
-                    location.reload();
+                    // 파일과 이벤트 데이터 임시 저장
+                    pendingImportFile = file;
+                    pendingImportEvents = events;
+                    
+                    // 색상 선택 팝업 표시
+                    document.getElementById('import-color-popup').style.display = 'block';
+                    document.getElementById('import-default-color').value = currentTheme;
+                    
                 } catch (error) {
-                    alert('파일을 읽는 중 오류가 발생했습니다.');
+                    console.error('ICS 파일 파싱 오류:', error);
+                    alert('ICS 파일을 읽는 중 오류가 발생했습니다. 파일 형식을 확인해주세요.');
                 }
             };
             reader.readAsText(file);
+        }
+
+        // 가져오기 실행
+        function confirmImport() {
+            if (!pendingImportEvents) {
+                alert('가져올 데이터가 없습니다.');
+                return;
+            }
+            
+            const defaultColor = document.getElementById('import-default-color').value;
+            const useExistingColors = document.getElementById('use-existing-colors').checked;
+            
+            const importedCount = importEventsToTasks(pendingImportEvents, defaultColor, useExistingColors);
+            alert(`${importedCount}개의 일정을 성공적으로 가져왔습니다.`);
+            
+            saveTasks();
+            renderSchedule();
+            renderTaskList();
+            updateStats();
+            
+            // 팝업 숨기기 및 데이터 초기화
+            cancelImport();
+        }
+
+        // 가져오기 취소
+        function cancelImport() {
+            document.getElementById('import-color-popup').style.display = 'none';
+            document.getElementById('import-ics-file').value = '';
+            pendingImportFile = null;
+            pendingImportEvents = null;
+        }
+
+        function importIcsData(event) {
+            // 이 함수는 더 이상 직접 사용되지 않음 (showImportColorPicker로 대체)
+        }
+
+        // ICS 파일 파싱
+        function parseIcsFile(icsContent) {
+            const events = [];
+            const lines = icsContent.split('\n').map(line => line.trim());
+            
+            let currentEvent = null;
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                
+                if (line === 'BEGIN:VEVENT') {
+                    currentEvent = {};
+                } else if (line === 'END:VEVENT' && currentEvent) {
+                    if (currentEvent.summary && currentEvent.dtstart && currentEvent.dtend) {
+                        events.push(currentEvent);
+                    }
+                    currentEvent = null;
+                } else if (currentEvent) {
+                    if (line.startsWith('SUMMARY:')) {
+                        currentEvent.summary = line.substring(8);
+                    } else if (line.startsWith('DTSTART:') || line.startsWith('DTSTART;')) {
+                        const dateTimeStr = line.split(':')[1];
+                        currentEvent.dtstart = parseIcsDateTime(dateTimeStr);
+                    } else if (line.startsWith('DTEND:') || line.startsWith('DTEND;')) {
+                        const dateTimeStr = line.split(':')[1];
+                        currentEvent.dtend = parseIcsDateTime(dateTimeStr);
+                    } else if (line.startsWith('DESCRIPTION:')) {
+                        currentEvent.description = line.substring(12);
+                    }
+                }
+            }
+            
+            return events;
+        }
+
+        // ICS 날짜/시간 파싱
+        function parseIcsDateTime(dateTimeStr) {
+            // YYYYMMDDTHHMMSS 또는 YYYYMMDD 형식
+            if (dateTimeStr.length === 8) {
+                // 날짜만 있는 경우 (종일 이벤트)
+                const year = parseInt(dateTimeStr.substring(0, 4));
+                const month = parseInt(dateTimeStr.substring(4, 6)) - 1;
+                const day = parseInt(dateTimeStr.substring(6, 8));
+                return new Date(year, month, day, 9, 0); // 기본 9시로 설정
+            } else if (dateTimeStr.length >= 15) {
+                // 날짜와 시간 모두 있는 경우
+                const year = parseInt(dateTimeStr.substring(0, 4));
+                const month = parseInt(dateTimeStr.substring(4, 6)) - 1;
+                const day = parseInt(dateTimeStr.substring(6, 8));
+                const hour = parseInt(dateTimeStr.substring(9, 11));
+                const minute = parseInt(dateTimeStr.substring(11, 13));
+                return new Date(year, month, day, hour, minute);
+            }
+            return null;
+        }
+
+        // 스포이드 기능 (EyeDropper API 사용)
+        async function startEyedropper(targetInputId) {
+            // EyeDropper API 지원 확인
+            if (!window.EyeDropper) {
+                alert('이 브라우저에서는 스포이드 기능을 지원하지 않습니다.\n크롬 기반 브라우저에서 사용해보세요.');
+                return;
+            }
+            
+            try {
+                const eyeDropper = new EyeDropper();
+                const result = await eyeDropper.open();
+                
+                if (result.sRGBHex) {
+                    const targetInput = document.getElementById(targetInputId);
+                    if (targetInput) {
+                        targetInput.value = result.sRGBHex;
+                        
+                        // 각 입력 필드별 추가 액션
+                        if (targetInputId === 'interface-color') {
+                            changeCustomTheme(result.sRGBHex);
+                        } else if (targetInputId === 'task-color') {
+                            // 할일 색상 변경시 별도 액션이 필요하면 여기에 추가
+                        } else if (targetInputId === 'import-default-color') {
+                            // 가져오기 기본 색상 변경시 별도 액션이 필요하면 여기에 추가
+                        }
+                    }
+                }
+            } catch (e) {
+                // 사용자가 취소했거나 오류 발생
+                if (e.name !== 'AbortError') {
+                    console.error('스포이드 오류:', e);
+                    alert('스포이드 기능을 사용할 수 없습니다.');
+                }
+            }
+        }
+
+        // 이벤트를 할일로 변환
+        function importEventsToTasks(events, defaultColor = null, useExistingColors = true) {
+            let importedCount = 0;
+            const importColor = defaultColor || currentTheme;
+            
+            events.forEach(event => {
+                if (!event.dtstart || !event.dtend) return;
+                
+                const startDate = event.dtstart;
+                const endDate = event.dtend;
+                
+                // 같은 날의 이벤트만 처리 (다른 날짜는 건너뜀)
+                if (startDate.toDateString() !== endDate.toDateString()) {
+                    return;
+                }
+                
+                const dateKey = getDateKey(startDate);
+                const startTime = startDate.getHours() * 60 + startDate.getMinutes();
+                const endTime = endDate.getHours() * 60 + endDate.getMinutes();
+                
+                // 유효한 시간 범위인지 확인
+                if (startTime >= endTime || startTime < 0 || endTime > 1440) {
+                    return;
+                }
+                
+                if (!tasks[dateKey]) tasks[dateKey] = [];
+                
+                const taskName = event.summary || '제목 없음';
+                const memo = event.description || '';
+                
+                // 색상 설정
+                let color = importColor;
+                if (useExistingColors && taskColors[taskName]) {
+                    color = taskColors[taskName];
+                } else {
+                    taskColors[taskName] = color;
+                }
+                
+                const newTask = {
+                    id: Date.now() + Math.random() + importedCount,
+                    name: taskName,
+                    startTime: startTime,
+                    endTime: endTime,
+                    color: color,
+                    memo: memo.length > 50 ? memo.substring(0, 50) : memo, // 메모 길이 제한
+                    completed: false,
+                    order: getNextOrder(dateKey)
+                };
+                
+                tasks[dateKey].push(newTask);
+                importedCount++;
+            });
+            
+            return importedCount;
         }
 
         // 통계
