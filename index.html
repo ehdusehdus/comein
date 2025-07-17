@@ -644,9 +644,30 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
+        }
+
+        @media (max-width: 500px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .stats-card {
+                padding: 15px;
+                min-height: 80px;
+            }
+            
+            .stats-card h3 {
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+            
+            .stats-value {
+                font-size: 1.5em;
+            }
         }
 
         .stats-card {
@@ -753,6 +774,25 @@
             .today-btn-container {
                 margin-left: 0;
                 flex-shrink: 0;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .stats-card {
+                padding: 15px;
+                min-height: 80px;
+            }
+            
+            .stats-card h3 {
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+            
+            .stats-value {
+                font-size: 1.5em;
             }
             
             .week-grid {
@@ -1687,10 +1727,23 @@
             const dayTasks = tasks[dateKey] || [];
             const daySimpleTasks = simpleTasks[dateKey] || [];
 
+            // 시간 지정 일정은 시간 순으로 정렬
+            const sortedDayTasks = dayTasks.sort((a, b) => a.startTime - b.startTime);
+            
             const allTasks = [
-                ...dayTasks.map(t => ({...t, type: 'timed'})),
+                ...sortedDayTasks.map(t => ({...t, type: 'timed'})),
                 ...daySimpleTasks.map(t => ({...t, type: 'simple'}))
-            ].sort((a, b) => (a.order || 0) - (b.order || 0));
+            ].sort((a, b) => {
+                // 시간 지정 일정끼리는 시간 순, 간단한 할일끼리는 order 순
+                if (a.type === 'timed' && b.type === 'timed') {
+                    return a.startTime - b.startTime;
+                } else if (a.type === 'simple' && b.type === 'simple') {
+                    return (a.order || 0) - (b.order || 0);
+                } else {
+                    // 시간 지정 일정과 간단한 할일 간의 정렬은 order 기준
+                    return (a.order || 0) - (b.order || 0);
+                }
+            });
 
             if (allTasks.length === 0) {
                 const emptyMessage = document.createElement('p');
