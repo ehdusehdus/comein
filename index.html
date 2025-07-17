@@ -1954,6 +1954,12 @@
                         dayCell.style.opacity = currentTask.completed ? 0.4 : 1;
                         
                         const taskStartHour = Math.floor(currentTask.startTime / 60);
+                        const taskEndHour = Math.ceil(currentTask.endTime / 60); // ceil로 변경하여 정확한 끝시간 계산
+                        const taskDurationHours = taskEndHour - taskStartHour;
+                        
+                        console.log(`Task: ${currentTask.name}, Start: ${taskStartHour}, End: ${taskEndHour}, Duration: ${taskDurationHours}, Current Hour: ${hour}`);
+                        
+                        // 첫 번째 시간대: 제목 표시
                         if (hour === taskStartHour) {
                             const titleSpan = document.createElement('span');
                             titleSpan.className = 'week-day-task-title';
@@ -1963,8 +1969,8 @@
                             }
                             dayCell.appendChild(titleSpan);
                             
-                            // 메모가 있고 10자 이하일 때만 표시
-                            if (currentTask.memo && currentTask.memo.length <= 10) {
+                            // 1시간 일정이면서 메모가 짧으면 같은 칸에 표시
+                            if (taskDurationHours <= 1 && currentTask.memo && currentTask.memo.length <= 6) {
                                 const memoSpan = document.createElement('span');
                                 memoSpan.className = 'week-day-task-memo';
                                 memoSpan.textContent = currentTask.memo;
@@ -1973,6 +1979,17 @@
                                 }
                                 dayCell.appendChild(memoSpan);
                             }
+                        }
+                        // 두 번째 시간대: 긴 일정의 메모 표시
+                        else if (hour === taskStartHour + 1 && taskDurationHours > 1 && currentTask.memo) {
+                            console.log(`Showing memo in second hour: ${currentTask.memo}`);
+                            const memoSpan = document.createElement('span');
+                            memoSpan.className = 'week-day-task-memo';
+                            memoSpan.textContent = currentTask.memo.length <= 10 ? currentTask.memo : currentTask.memo.substring(0, 10) + '...';
+                            if (currentTask.completed) {
+                                memoSpan.style.textDecoration = 'line-through';
+                            }
+                            dayCell.appendChild(memoSpan);
                         }
                         
                         dayCell.title = `${currentTask.name}${currentTask.memo ? ' - ' + currentTask.memo : ''} (${timeToString(currentTask.startTime)} - ${timeToString(currentTask.endTime)})`;
