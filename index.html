@@ -1863,7 +1863,7 @@
                 const alertDiv = document.createElement('div');
                 alertDiv.id = 'undo-delete-alert';
                 alertDiv.style.cssText = 'background:#ffeaa7;color:#495057;padding:10px 16px;border-radius:8px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;';
-                alertDiv.innerHTML = `<span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;font-weight:600;font-size:14px;">"${lastDeletedTask.name}" 삭제됨</span>` +
+                alertDiv.innerHTML = `<span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;font-weight:400;font-size:14px;">"${lastDeletedTask.name}" 삭제됨</span>` +
                     `<div style='display:flex;gap:6px;'><button onclick='restoreDeletedTask()' style='background:#6c757d;color:white;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;'>되돌리기</button>` +
                     `<button onclick='closeUndoAlert()' style='background:none;border:none;font-size:18px;color:#495057;cursor:pointer;' title='닫기'>&times;</button></div>`;
                 container.appendChild(alertDiv);
@@ -1873,7 +1873,7 @@
                 const alertDiv = document.createElement('div');
                 alertDiv.id = 'undo-simple-delete-alert';
                 alertDiv.style.cssText = 'background:#ffeaa7;color:#495057;padding:10px 16px;border-radius:8px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;';
-                alertDiv.innerHTML = `<span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;font-weight:600;font-size:14px;">"${lastDeletedSimpleTask.text}" 삭제됨</span>` +
+                alertDiv.innerHTML = `<span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;font-weight:400;font-size:14px;">"${lastDeletedSimpleTask.text}" 삭제됨</span>` +
                     `<div style='display:flex;gap:6px;'><button onclick='restoreDeletedSimpleTask()' style='background:#6c757d;color:white;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;'>되돌리기</button>` +
                     `<button onclick='closeUndoSimpleAlert()' style='background:none;border:none;font-size:18px;color:#495057;cursor:pointer;' title='닫기'>&times;</button></div>`;
                 container.appendChild(alertDiv);
@@ -1887,7 +1887,7 @@
                         const alertDiv = document.createElement('div');
                         alertDiv.id = 'undo-bulk-delete-alert-today';
                         alertDiv.style.cssText = 'background:#ffeaa7;color:#495057;padding:10px 16px;border-radius:8px;margin:10px 0 0 0;display:flex;align-items:center;justify-content:space-between;gap:10px;';
-                        alertDiv.innerHTML = `<span>오늘의 모든 할일 삭제됨</span>` +
+                        alertDiv.innerHTML = `<span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;font-weight:400;font-size:14px;">오늘의 모든 할일 삭제됨</span>` +
                             `<div style='display:flex;gap:6px;'><button onclick='restoreBulkDeleted()' style='background:#6c757d;color:white;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;'>되돌리기</button>` +
                             `<button onclick='closeUndoBulkAlert()' style='background:none;border:none;font-size:18px;color:#495057;cursor:pointer;' title='닫기'>&times;</button></div>`;
                         todayBtn.parentNode.insertAdjacentElement('afterend', alertDiv);
@@ -1896,7 +1896,6 @@
             }
             // 삭제 복구 알림 (전체 삭제)
             if (lastBulkDeleted && lastBulkDeletedType === 'all') {
-                // 설정 뷰의 전체 삭제 버튼 아래에 렌더링
                 let allBtn = document.querySelector('#settings-view .btn[onclick*="clearAllTasks"]');
                 if (allBtn) {
                     let exist = document.getElementById('undo-bulk-delete-alert-all');
@@ -1904,7 +1903,7 @@
                         const alertDiv = document.createElement('div');
                         alertDiv.id = 'undo-bulk-delete-alert-all';
                         alertDiv.style.cssText = 'background:#ffeaa7;color:#495057;padding:10px 16px;border-radius:8px;margin:10px 0 0 0;display:flex;align-items:center;justify-content:space-between;gap:10px;';
-                        alertDiv.innerHTML = `<span>전체 데이터 삭제됨</span>` +
+                        alertDiv.innerHTML = `<span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;font-weight:400;font-size:14px;">전체 데이터 삭제됨</span>` +
                             `<div style='display:flex;gap:6px;'><button onclick='restoreBulkDeleted()' style='background:#6c757d;color:white;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;'>되돌리기</button>` +
                             `<button onclick='closeUndoBulkAlert()' style='background:none;border:none;font-size:18px;color:#495057;cursor:pointer;' title='닫기'>&times;</button></div>`;
                         allBtn.parentNode.insertAdjacentElement('afterend', alertDiv);
