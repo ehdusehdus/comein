@@ -1393,12 +1393,9 @@
             updateTaskFrequency();
             updateTaskSuggestions();
             resetForm();
+            console.log('addTask 렌더 직전', currentDate, getDateKey(currentDate), tasks[getDateKey(currentDate)]);
             renderSchedule();
             renderTaskList();
-            setTimeout(() => {
-                renderSchedule();
-                renderTaskList();
-            }, 0);
         }
 
         function addSimpleTask() {
