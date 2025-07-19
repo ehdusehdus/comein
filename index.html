@@ -1112,6 +1112,14 @@
         let lastUsedTime = { startHour: 6, startMinute: 0, endHour: 7, endMinute: 0 };
         let pendingImportFile = null;
         let pendingImportEvents = null;
+        // 삭제된 할일 임시 저장용
+        let lastDeletedTask = null;
+        let lastDeletedTaskDateKey = null;
+        // 삭제된 간단한 할일/전체 삭제 임시 저장용
+        let lastDeletedSimpleTask = null;
+        let lastDeletedSimpleTaskDateKey = null;
+        let lastBulkDeleted = null;
+        let lastBulkDeletedType = null; // 'today' or 'all'
 
         // 초기화
         function init() {
@@ -1541,6 +1549,12 @@
         // 할일 삭제 시에도 빈도수/자동완성 갱신
         function deleteTask(dateKey, taskId) {
             if (tasks[dateKey]) {
+                // 삭제할 task 찾기
+                const deleted = tasks[dateKey].find(t => t.id === taskId);
+                if (deleted) {
+                    lastDeletedTask = deleted;
+                    lastDeletedTaskDateKey = dateKey;
+                }
                 tasks[dateKey] = tasks[dateKey].filter(t => t.id !== taskId);
                 if (tasks[dateKey].length === 0) delete tasks[dateKey];
                 saveTasks();
@@ -1553,12 +1567,34 @@
 
         function deleteSimpleTask(dateKey, taskId) {
             if (!simpleTasks[dateKey]) return;
-            
+            // 삭제할 task 찾기
+            const deleted = simpleTasks[dateKey].find(t => t.id === taskId);
+            if (deleted) {
+                lastDeletedSimpleTask = deleted;
+                lastDeletedSimpleTaskDateKey = dateKey;
+            }
             simpleTasks[dateKey] = simpleTasks[dateKey].filter(t => t.id !== taskId);
             if (simpleTasks[dateKey].length === 0) delete simpleTasks[dateKey];
-            
             saveTasks();
             renderTaskList();
+        }
+
+        function restoreDeletedSimpleTask() {
+            if (lastDeletedSimpleTask && lastDeletedSimpleTaskDateKey) {
+                if (!simpleTasks[lastDeletedSimpleTaskDateKey]) simpleTasks[lastDeletedSimpleTaskDateKey] = [];
+                simpleTasks[lastDeletedSimpleTaskDateKey].push(lastDeletedSimpleTask);
+                saveTasks();
+                renderTaskList();
+                lastDeletedSimpleTask = null;
+                lastDeletedSimpleTaskDateKey = null;
+            }
+        }
+
+        function closeUndoSimpleAlert() {
+            lastDeletedSimpleTask = null;
+            lastDeletedSimpleTaskDateKey = null;
+            const alertDiv = document.getElementById('undo-simple-delete-alert');
+            if (alertDiv) alertDiv.remove();
         }
 
         // 드래그 앤 드롭
@@ -1818,10 +1854,41 @@
         // 할일 목록 렌더링
         function renderTaskList() {
             const container = document.getElementById('task-list-container');
+            container.innerHTML = '';
+            // 삭제 복구 알림 (시간 지정)
+            if (lastDeletedTask && lastDeletedTaskDateKey) {
+                const alertDiv = document.createElement('div');
+                alertDiv.id = 'undo-delete-alert';
+                alertDiv.style.cssText = 'background:#ffeaa7;color:#495057;padding:10px 16px;border-radius:8px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;';
+                alertDiv.innerHTML = `<span>"${lastDeletedTask.name}" 삭제됨</span>` +
+                    `<div style='display:flex;gap:6px;'><button onclick='restoreDeletedTask()' style='background:#6c757d;color:white;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;'>되돌리기</button>` +
+                    `<button onclick='closeUndoAlert()' style='background:none;border:none;font-size:18px;color:#495057;cursor:pointer;' title='닫기'>&times;</button></div>`;
+                container.appendChild(alertDiv);
+            }
+            // 삭제 복구 알림 (간단한 할일)
+            if (lastDeletedSimpleTask && lastDeletedSimpleTaskDateKey) {
+                const alertDiv = document.createElement('div');
+                alertDiv.id = 'undo-simple-delete-alert';
+                alertDiv.style.cssText = 'background:#ffeaa7;color:#495057;padding:10px 16px;border-radius:8px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;';
+                alertDiv.innerHTML = `<span>"${lastDeletedSimpleTask.text}" 삭제됨</span>` +
+                    `<div style='display:flex;gap:6px;'><button onclick='restoreDeletedSimpleTask()' style='background:#6c757d;color:white;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;'>되돌리기</button>` +
+                    `<button onclick='closeUndoSimpleAlert()' style='background:none;border:none;font-size:18px;color:#495057;cursor:pointer;' title='닫기'>&times;</button></div>`;
+                container.appendChild(alertDiv);
+            }
+            // 삭제 복구 알림 (오늘 전체/전체 삭제)
+            if (lastBulkDeleted && lastBulkDeletedType) {
+                const alertDiv = document.createElement('div');
+                alertDiv.id = 'undo-bulk-delete-alert';
+                alertDiv.style.cssText = 'background:#ffeaa7;color:#495057;padding:10px 16px;border-radius:8px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;';
+                let msg = lastBulkDeletedType === 'today' ? '오늘의 모든 할일 삭제됨' : '전체 데이터 삭제됨';
+                alertDiv.innerHTML = `<span>${msg}</span>` +
+                    `<div style='display:flex;gap:6px;'><button onclick='restoreBulkDeleted()' style='background:#6c757d;color:white;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;'>되돌리기</button>` +
+                    `<button onclick='closeUndoBulkAlert()' style='background:none;border:none;font-size:18px;color:#495057;cursor:pointer;' title='닫기'>&times;</button></div>`;
+                container.appendChild(alertDiv);
+            }
             
             const inputRow = container.querySelector('.simple-task-input-row');
             const moveTasksContainer = container.querySelector('.move-tasks-container');
-            container.innerHTML = '';
             
             if (inputRow) {
                 container.appendChild(inputRow);
@@ -2292,39 +2359,26 @@
         // 데이터 관리 시에도 빈도수/자동완성 갱신
         function clearTodayTasks() {
             const dateKey = getDateKey(currentDate);
-            
-            const hasTasks = tasks[dateKey] && tasks[dateKey].length > 0;
-            const hasSimpleTasks = simpleTasks[dateKey] && simpleTasks[dateKey].length > 0;
-            
-            if (hasTasks || hasSimpleTasks) {
-                if (confirm('오늘의 모든 일정을 삭제하시겠습니까?')) {
-                    if (hasTasks) delete tasks[dateKey];
-                    if (hasSimpleTasks) delete simpleTasks[dateKey];
-                    saveTasks();
-                    updateTaskFrequency();
-                    updateTaskSuggestions();
-                    renderSchedule();
-                    renderTaskList();
-                }
-            } else {
-                alert('오늘 삭제할 일정이 없습니다.');
+            if (tasks[dateKey] && tasks[dateKey].length > 0) {
+                delete tasks[dateKey];
+                saveTasks();
+                renderSchedule();
+                renderTaskList();
             }
         }
 
         function clearAllTasks() {
-            if (confirm('모든 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-                tasks = {};
-                taskColors = {};
-                simpleTasks = {};
-                taskFrequency = {};
-                localStorage.removeItem('timeTracker_tasks');
-                localStorage.removeItem('timeTracker_colors');
-                localStorage.removeItem('timeTracker_simpleTasks');
-                updateTaskSuggestions();
-                renderSchedule();
-                renderTaskList();
-                updateStats();
-            }
+            tasks = {};
+            taskColors = {};
+            simpleTasks = {};
+            taskFrequency = {};
+            localStorage.removeItem('timeTracker_tasks');
+            localStorage.removeItem('timeTracker_colors');
+            localStorage.removeItem('timeTracker_simpleTasks');
+            updateTaskSuggestions();
+            renderSchedule();
+            renderTaskList();
+            updateStats();
         }
 
         // 설정 관련
@@ -2903,6 +2957,27 @@
                 applyLastUsedTime();
             }, 0);
         });
+
+        function restoreDeletedTask() {
+            if (lastDeletedTask && lastDeletedTaskDateKey) {
+                if (!tasks[lastDeletedTaskDateKey]) tasks[lastDeletedTaskDateKey] = [];
+                tasks[lastDeletedTaskDateKey].push(lastDeletedTask);
+                saveTasks();
+                updateTaskFrequency();
+                updateTaskSuggestions();
+                renderSchedule();
+                renderTaskList();
+                lastDeletedTask = null;
+                lastDeletedTaskDateKey = null;
+            }
+        }
+
+        function closeUndoAlert() {
+            lastDeletedTask = null;
+            lastDeletedTaskDateKey = null;
+            const alertDiv = document.getElementById('undo-delete-alert');
+            if (alertDiv) alertDiv.remove();
+        }
     </script>
 </body>
 </html>
