@@ -3031,8 +3031,8 @@
                 lastBulkDeleted = null;
                 lastBulkDeletedType = null;
                 // 안내창 직접 제거
-                const alertDiv = document.getElementById('undo-bulk-delete-alert');
-                if (alertDiv) alertDiv.remove();
+                const alertToday = document.getElementById('undo-bulk-delete-alert-today');
+                if (alertToday) alertToday.remove();
             } else if (lastBulkDeleted && lastBulkDeletedType === 'all') {
                 if (lastBulkDeleted.tasks) tasks = JSON.parse(JSON.stringify(lastBulkDeleted.tasks));
                 if (lastBulkDeleted.simpleTasks) simpleTasks = JSON.parse(JSON.stringify(lastBulkDeleted.simpleTasks));
@@ -3044,9 +3044,18 @@
                 lastBulkDeleted = null;
                 lastBulkDeletedType = null;
                 // 안내창 직접 제거
-                const alertDiv = document.getElementById('undo-bulk-delete-alert');
-                if (alertDiv) alertDiv.remove();
+                const alertAll = document.getElementById('undo-bulk-delete-alert-all');
+                if (alertAll) alertAll.remove();
             }
+        }
+
+        function closeUndoBulkAlert() {
+            lastBulkDeleted = null;
+            lastBulkDeletedType = null;
+            const alertToday = document.getElementById('undo-bulk-delete-alert-today');
+            if (alertToday) alertToday.remove();
+            const alertAll = document.getElementById('undo-bulk-delete-alert-all');
+            if (alertAll) alertAll.remove();
         }
     </script>
 </body>
