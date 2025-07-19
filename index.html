@@ -1396,6 +1396,7 @@
             console.log('addTask 렌더 직전', currentDate, getDateKey(currentDate), tasks[getDateKey(currentDate)]);
             renderSchedule();
             renderTaskList();
+            showTab('daily');
         }
 
         function addSimpleTask() {
@@ -1475,10 +1476,14 @@
             const memoInput = document.getElementById('simple-task-memo');
             const addBtn = document.querySelector('.simple-task-add-btn');
             
-            input.value = '';
-            memoInput.value = '';
-            input.placeholder = '간단한 할일 입력...';
-            memoInput.placeholder = '';
+            if (input) {
+                input.value = '';
+                input.placeholder = '간단한 할일 입력...';
+            }
+            if (memoInput) {
+                memoInput.value = '';
+                memoInput.placeholder = '';
+            }
             if (addBtn) addBtn.textContent = '추가';
         }
 
