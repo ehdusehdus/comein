@@ -1587,6 +1587,9 @@
                 renderTaskList();
                 lastDeletedSimpleTask = null;
                 lastDeletedSimpleTaskDateKey = null;
+                // 안내창 직접 제거
+                const alertDiv = document.getElementById('undo-simple-delete-alert');
+                if (alertDiv) alertDiv.remove();
             }
         }
 
@@ -2359,15 +2362,27 @@
         // 데이터 관리 시에도 빈도수/자동완성 갱신
         function clearTodayTasks() {
             const dateKey = getDateKey(currentDate);
-            if (tasks[dateKey] && tasks[dateKey].length > 0) {
-                delete tasks[dateKey];
-                saveTasks();
-                renderSchedule();
-                renderTaskList();
-            }
+            // 삭제 전 백업
+            lastBulkDeleted = {
+                tasks: tasks[dateKey] ? [...tasks[dateKey]] : [],
+                simpleTasks: simpleTasks[dateKey] ? [...simpleTasks[dateKey]] : []
+            };
+            lastBulkDeletedType = 'today';
+            if (tasks[dateKey]) delete tasks[dateKey];
+            if (simpleTasks[dateKey]) delete simpleTasks[dateKey];
+            saveTasks();
+            renderSchedule();
+            renderTaskList();
         }
 
         function clearAllTasks() {
+            // 전체 삭제 전 백업
+            lastBulkDeleted = {
+                tasks: JSON.parse(JSON.stringify(tasks)),
+                simpleTasks: JSON.parse(JSON.stringify(simpleTasks)),
+                taskColors: JSON.parse(JSON.stringify(taskColors))
+            };
+            lastBulkDeletedType = 'all';
             tasks = {};
             taskColors = {};
             simpleTasks = {};
@@ -2969,6 +2984,9 @@
                 renderTaskList();
                 lastDeletedTask = null;
                 lastDeletedTaskDateKey = null;
+                // 안내창 직접 제거
+                const alertDiv = document.getElementById('undo-delete-alert');
+                if (alertDiv) alertDiv.remove();
             }
         }
 
@@ -2977,6 +2995,35 @@
             lastDeletedTaskDateKey = null;
             const alertDiv = document.getElementById('undo-delete-alert');
             if (alertDiv) alertDiv.remove();
+        }
+
+        function restoreBulkDeleted() {
+            if (lastBulkDeleted && lastBulkDeletedType === 'today') {
+                const dateKey = getDateKey(currentDate);
+                if (lastBulkDeleted.tasks.length > 0) tasks[dateKey] = [...lastBulkDeleted.tasks];
+                if (lastBulkDeleted.simpleTasks.length > 0) simpleTasks[dateKey] = [...lastBulkDeleted.simpleTasks];
+                saveTasks();
+                renderSchedule();
+                renderTaskList();
+                lastBulkDeleted = null;
+                lastBulkDeletedType = null;
+                // 안내창 직접 제거
+                const alertDiv = document.getElementById('undo-bulk-delete-alert');
+                if (alertDiv) alertDiv.remove();
+            } else if (lastBulkDeleted && lastBulkDeletedType === 'all') {
+                if (lastBulkDeleted.tasks) tasks = JSON.parse(JSON.stringify(lastBulkDeleted.tasks));
+                if (lastBulkDeleted.simpleTasks) simpleTasks = JSON.parse(JSON.stringify(lastBulkDeleted.simpleTasks));
+                if (lastBulkDeleted.taskColors) taskColors = JSON.parse(JSON.stringify(lastBulkDeleted.taskColors));
+                saveTasks();
+                renderSchedule();
+                renderTaskList();
+                updateStats();
+                lastBulkDeleted = null;
+                lastBulkDeletedType = null;
+                // 안내창 직접 제거
+                const alertDiv = document.getElementById('undo-bulk-delete-alert');
+                if (alertDiv) alertDiv.remove();
+            }
         }
     </script>
 </body>
