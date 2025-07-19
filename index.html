@@ -1863,7 +1863,7 @@
                 const alertDiv = document.createElement('div');
                 alertDiv.id = 'undo-delete-alert';
                 alertDiv.style.cssText = 'background:#ffeaa7;color:#495057;padding:10px 16px;border-radius:8px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;';
-                alertDiv.innerHTML = `<span>"${lastDeletedTask.name}" 삭제됨</span>` +
+                alertDiv.innerHTML = `<span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;font-weight:600;font-size:14px;">"${lastDeletedTask.name}" 삭제됨</span>` +
                     `<div style='display:flex;gap:6px;'><button onclick='restoreDeletedTask()' style='background:#6c757d;color:white;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;'>되돌리기</button>` +
                     `<button onclick='closeUndoAlert()' style='background:none;border:none;font-size:18px;color:#495057;cursor:pointer;' title='닫기'>&times;</button></div>`;
                 container.appendChild(alertDiv);
@@ -1873,14 +1873,13 @@
                 const alertDiv = document.createElement('div');
                 alertDiv.id = 'undo-simple-delete-alert';
                 alertDiv.style.cssText = 'background:#ffeaa7;color:#495057;padding:10px 16px;border-radius:8px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;';
-                alertDiv.innerHTML = `<span>"${lastDeletedSimpleTask.text}" 삭제됨</span>` +
+                alertDiv.innerHTML = `<span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;font-weight:600;font-size:14px;">"${lastDeletedSimpleTask.text}" 삭제됨</span>` +
                     `<div style='display:flex;gap:6px;'><button onclick='restoreDeletedSimpleTask()' style='background:#6c757d;color:white;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;'>되돌리기</button>` +
                     `<button onclick='closeUndoSimpleAlert()' style='background:none;border:none;font-size:18px;color:#495057;cursor:pointer;' title='닫기'>&times;</button></div>`;
                 container.appendChild(alertDiv);
             }
             // 삭제 복구 알림 (오늘 전체 삭제)
             if (lastBulkDeleted && lastBulkDeletedType === 'today') {
-                // 오늘 전체 삭제 버튼 아래에 렌더링
                 let todayBtn = document.querySelector('.form-btns-right button[onclick*="clearTodayTasks"]');
                 if (todayBtn) {
                     let exist = document.getElementById('undo-bulk-delete-alert-today');
