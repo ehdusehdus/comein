@@ -1395,6 +1395,10 @@
             resetForm();
             renderSchedule();
             renderTaskList();
+            setTimeout(() => {
+                renderSchedule();
+                renderTaskList();
+            }, 0);
         }
 
         function addSimpleTask() {
