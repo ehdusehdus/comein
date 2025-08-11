@@ -111,7 +111,7 @@
             background: none;
             border: none;
             color: #6c757d;
-            font-size: var(--font-size-large);
+            font-size: var(--font-size-base);
             cursor: pointer;
             padding: 3px;
             border-radius: 4px;
@@ -270,7 +270,7 @@
         .toggle-list-btn {
             background: none;
             border: none;
-            font-size: var(--font-size-large);
+            font-size: var(--font-size-base);
             cursor: pointer;
             color: var(--primary-color);
             padding: 5px;
@@ -2511,11 +2511,7 @@
 
                     if (dayTasks.length > maxShow && maxShow > 1) {
                         const moreDiv = document.createElement('div');
-                        moreDiv.style.cssText = `
-                            color: #6c757d;
-                            font-size: 10px;
-                            margin-top: 2px;
-                        `;
+                        moreDiv.className = 'month-day-more';
                         moreDiv.textContent = `+${dayTasks.length - maxShow}개 더`;
                         dayCell.appendChild(moreDiv);
                     }
