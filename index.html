@@ -1121,6 +1121,34 @@
         let lastBulkDeleted = null;
         let lastBulkDeletedType = null; // 'today' or 'all'
 
+        // 할일 입력란 보장 함수
+        function ensureTaskInputExists() {
+            const container = document.getElementById('task-list-container');
+            const existingInput = container.querySelector('.simple-task-input-row');
+            
+            if (!existingInput) {
+                // 할일 입력란이 없으면 다시 추가
+                const inputRow = document.createElement('div');
+                inputRow.className = 'simple-task-input-row';
+                inputRow.innerHTML = `
+                    <input type="text" 
+                           id="simple-task-input" 
+                           class="simple-task-input" 
+                           placeholder="간단한 할일 입력..." 
+                           onkeypress="handleSimpleTaskKeyPress(event)">
+                    <input type="text" 
+                           id="simple-task-memo" 
+                           class="simple-task-memo" 
+                           placeholder="" 
+                           maxlength="30">
+                    <button class="simple-task-add-btn" onclick="addSimpleTask()">추가</button>
+                `;
+                
+                // 컨테이너의 맨 앞에 추가
+                container.insertBefore(inputRow, container.firstChild);
+            }
+        }
+
         // 초기화
         function init() {
             loadTasks();
@@ -1133,6 +1161,9 @@
             renderSchedule();
             renderTaskList();
             updateStats();
+            
+            // 할일 입력란이 제대로 표시되는지 확인
+            ensureTaskInputExists();
         }
 
         // 데이터 로드/저장
@@ -1863,7 +1894,18 @@
         // 할일 목록 렌더링
         function renderTaskList() {
             const container = document.getElementById('task-list-container');
-            container.innerHTML = '';
+            
+            // 할일 입력란과 미완료 할일 이동 버튼을 제외한 할일 목록만 지우기
+            const existingInput = container.querySelector('.simple-task-input-row');
+            const existingMoveBtn = container.querySelector('.move-tasks-container');
+            
+            // 기존 할일 목록만 제거
+            const existingTasks = container.querySelectorAll('.task-item, .simple-task-item');
+            existingTasks.forEach(task => task.remove());
+            
+            // 삭제 복구 알림들 제거
+            const existingAlerts = container.querySelectorAll('#undo-delete-alert, #undo-simple-delete-alert, #undo-bulk-delete-alert-today');
+            existingAlerts.forEach(alert => alert.remove());
             // 삭제 복구 알림 (시간 지정)
             if (lastDeletedTask && lastDeletedTaskDateKey) {
                 const alertDiv = document.createElement('div');
